@@ -1,0 +1,6 @@
+<configuration>
+    <input>
+       <net-file value="rulebase.net.xml"/>
+       <route-files value="rulebase2.rou.xml"/>
+    </input>
+</configuration>

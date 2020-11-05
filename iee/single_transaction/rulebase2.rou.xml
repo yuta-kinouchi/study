@@ -39,21 +39,21 @@
 <flow id="type4" color="1,1,0" begin="0" end="100" period="10" type="car" route="route04"/>
   -->
   <!-- 交通量５：５ -->
-<!-- <flow id="type1" color="1,1,0" begin="0" end="100000" vehsPerHour="600" type="car" route="t_b"/>
-<flow id="type2" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="t_r"/>
-<flow id="type3" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="t_l"/>
+<!-- <flow id="type1" color="1,1,0" begin="0" end="10000000" vehsPerHour="600" type="car" route="t_b"/>
+<flow id="type2" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="t_r"/>
+<flow id="type3" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="t_l"/>
 
-<flow id="type4" color="1,1,0" begin="0" end="100000" vehsPerHour="600" type="car" route="b_t"/>
-<flow id="type5" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="b_r"/>
-<flow id="type6" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="b_l"/>
+<flow id="type4" color="1,1,0" begin="0" end="10000000" vehsPerHour="600" type="car" route="b_t"/>
+<flow id="type5" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="b_r"/>
+<flow id="type6" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="b_l"/>
 
-<flow id="type7" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="r_t"/>
-<flow id="type8" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="r_b"/>
-<flow id="type9" color="1,1,0" begin="0" end="100000" vehsPerHour="600" type="car" route="r_l"/>
+<flow id="type7" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="r_t"/>
+<flow id="type8" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="r_b"/>
+<flow id="type9" color="1,1,0" begin="0" end="10000000" vehsPerHour="600" type="car" route="r_l"/>
 
-<flow id="type10" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="l_t"/>
-<flow id="type11" color="1,1,0" begin="0" end="100000" vehsPerHour="150" type="car" route="l_b"/>
-<flow id="type12" color="1,1,0" begin="0" end="100000" vehsPerHour="600" type="car" route="l_r"/> -->
+<flow id="type10" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="l_t"/>
+<flow id="type11" color="1,1,0" begin="0" end="10000000" vehsPerHour="150" type="car" route="l_b"/>
+<flow id="type12" color="1,1,0" begin="0" end="10000000" vehsPerHour="600" type="car" route="l_r"/> -->
 
 <!-- 交通量　６：４ -->
 <!-- <flow id="type1" color="1,1,0" begin="0" end="100000" vehsPerHour="720" type="car" route="t_b"/>
@@ -73,7 +73,7 @@
 <flow id="type12" color="1,1,0" begin="0" end="100000" vehsPerHour="480" type="car" route="l_r"/> -->
 
 <!-- 交通量　7：3 -->
-<!-- <flow id="type1" color="1,1,0" begin="0" end="1000000" vehsPerHour="840" type="car" route="t_b"/>
+<flow id="type1" color="1,1,0" begin="0" end="1000000" vehsPerHour="840" type="car" route="t_b"/>
 <flow id="type2" color="1,1,0" begin="0" end="1000000" vehsPerHour="210" type="car" route="t_r"/>
 <flow id="type3" color="1,1,0" begin="0" end="1000000" vehsPerHour="210" type="car" route="t_l"/>
 
@@ -87,7 +87,7 @@
 
 <flow id="type10" color="1,1,0" begin="0" end="1000000" vehsPerHour="90" type="car" route="l_t"/>
 <flow id="type11" color="1,1,0" begin="0" end="1000000" vehsPerHour="90" type="car" route="l_b"/>
-<flow id="type12" color="1,1,0" begin="0" end="1000000" vehsPerHour="360" type="car" route="l_r"/> -->
+<flow id="type12" color="1,1,0" begin="0" end="1000000" vehsPerHour="360" type="car" route="l_r"/>
 
 <!-- 交通量　8：2 -->
 <!-- <flow id="type1" color="1,1,0" begin="0" end="1000000" vehsPerHour="960" type="car" route="t_b"/>
@@ -122,32 +122,19 @@
 <flow id="type10" color="1,1,0" begin="0" end="1000000" vehsPerHour="30" type="car" route="l_t"/>
 <flow id="type11" color="1,1,0" begin="0" end="1000000" vehsPerHour="30" type="car" route="l_b"/>
 <flow id="type12" color="1,1,0" begin="0" end="1000000" vehsPerHour="120" type="car" route="l_r"/> -->
-<!--交通量5:5-->
+<!--交通量2:1-->
 <!-- <flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="t_b"/>
-<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_r"/>
-<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_l"/>
+<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="t_r"/>
+<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="t_l"/>
 <flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="b_t"/>
-<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_r"/>
-<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_l"/>
-<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_t"/>
-<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_b"/>
+<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="b_r"/>
+<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="b_l"/>
+<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="r_t"/>
+<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="r_b"/>
 <flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="r_l"/>
-<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_t"/>
-<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_b"/>
+<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="l_t"/>
+<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.041" type="car" route="l_b"/>
 <flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="l_r"/> -->
-
-<flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="t_b"/>
-<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_r"/>
-<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_l"/>
-<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="b_t"/>
-<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_r"/>
-<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_l"/>
-<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_t"/>
-<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_b"/>
-<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="r_l"/>
-<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_t"/>
-<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_b"/>
-<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="l_r"/>
 
 
 <!-- <personFlow period="10" end="10000000" begin="0" id="p1">

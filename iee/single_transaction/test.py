@@ -1,12 +1,8 @@
-import numpy as np
-
-"""
-get_signal_stateの中にはタプルデータが入っている
-"""
-# y = (1,2,3,4,5)
-# times = tuple(np.array(y) + np.array(1))
-
-# print(times)
-
-for i in range(500):
-    print(np.random.choice(2))
+print("ポットの合計")
+pot = int(input())
+print("ベット額")
+bet = int(input())
+print("アウツの数")
+autu = int(input())
+a = (pot + bet) / bet * autu *0.2
+print(a)

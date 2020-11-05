@@ -1,0 +1,6 @@
+<configuration>
+    <input>
+       <net-file value="reinforcement_choice.net.xml"/>
+       <route-files value="reinforcement.rou.xml"/>
+    </input>
+</configuration>

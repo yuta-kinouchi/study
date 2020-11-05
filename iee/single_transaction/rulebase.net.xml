@@ -203,11 +203,11 @@
     </edge>
 
     <tlLogic id="c" type="static" programID="1" offset="0">
-        <phase duration="33" state="GGGgrrrrGGGgrrrr" index="0" />
+        <phase duration="35" state="GGGgrrrrGGGgrrrr" index="0" />
         <phase duration="3"  state="yyygrrrryyygrrrr" index="1"/>
         <phase duration="6"  state="rrrGrrrrrrrGrrrr" index="2"/>
         <phase duration="3"  state="rrryrrrrrrryrrrr" index="3" />
-        <phase duration="33"  state="rrrrGGGgrrrrGGGg" index="4" />
+        <phase duration="35"  state="rrrrGGGgrrrrGGGg" index="4" />
         <phase duration="3"  state="rrrryyygrrrryyyg" index="5" />
         <phase duration="6"  state="rrrrrrrGrrrrrrrG" index="6" />
         <phase duration="3"  state="rrrrrrryrrrrrrry" index="7" />
