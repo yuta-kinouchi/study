@@ -38,7 +38,7 @@
 <flow id="type3" color="1,1,0" begin="0" end="100" period="10" type="car" route="route03"/>
 <flow id="type4" color="1,1,0" begin="0" end="100" period="10" type="car" route="route04"/>
   -->
-<flow id="type1" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="t_b"/>
+<!-- <flow id="type1" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="t_b"/>
 <flow id="type2" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="t_r"/>
 <flow id="type3" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="t_l"/>
 
@@ -52,7 +52,33 @@
 
 <flow id="type10" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="l_t"/>
 <flow id="type11" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="l_b"/>
-<flow id="type12" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="l_r"/>
+<flow id="type12" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="l_r"/> -->
+<!-- 比率　1:1 -->
+<!-- <flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="t_b"/>
+<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_r"/>
+<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_l"/>
+<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="b_t"/>
+<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_r"/>
+<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_l"/>
+<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_t"/>
+<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_b"/>
+<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="r_l"/>
+<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_t"/>
+<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_b"/>
+<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="l_r"/> -->
+
+<flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="t_b"/>
+<!-- <flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="t_r"/>
+<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="t_l"/> -->
+<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="b_t"/>
+<!-- <flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="b_r"/>
+<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="b_l"/>
+<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="r_t"/>
+<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="r_b"/> -->
+<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="r_l"/>
+<!-- <flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="l_t"/>
+<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="l_b"/> -->
+<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="l_r"/>
 
 <!-- <flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.2" type="car" route="t_b"/>
 <flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="t_r"/>

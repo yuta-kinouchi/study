@@ -1,6 +1,6 @@
 <configuration>
     <input>
        <net-file value="rulebase.net.xml"/>
-       <route-files value="rulebase.rou.xml"/>
+       <route-files value="reinforcement.rou.xml"/>
     </input>
 </configuration>

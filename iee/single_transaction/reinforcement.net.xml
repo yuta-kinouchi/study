@@ -172,8 +172,8 @@
         <phase duration="50" state="rrrrGGGgrrrrGGGg" index="4" />
         <phase duration="3" state="rrrryyygrrrryyyg" index="5" />
         <phase duration="6" state="rrrrrrrGrrrrrrrG" index="6" />
-        <phase duration="2" state="rrrrrrryrrrrrrry" index="7" />
-        <phase duration="1" state="rrrrrrryrrrrrrry" index="8" />
+        <phase duration="3" state="rrrrrrryrrrrrrry" index="7" />
+        <!-- <phase duration="1" state="rrrrrrryrrrrrrry" index="8" /> -->
     </tlLogic>
 
     <junction id="b" type="priority" x="0.00" y="-200.00" incLanes="c_b_0 c_b_1 bb_b_0 bb_b_1 bb_b_2" intLanes=":b_0_0 :b_0_1 :b_2_0 :b_2_1 :b_2_2" shape="-6.40,-200.00 9.60,-200.00 -6.40,-200.00">

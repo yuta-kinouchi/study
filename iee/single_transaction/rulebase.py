@@ -71,7 +71,7 @@ if __name__ == "__main__":
     traci.simulationStep(1000)
     cycle = 0
     j = 0
-    for iter in range(500):
+    for iter in range(100):
         for step in range(475):
             # r = reward()
             # rewards.append(r)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     traci.simulationStep(1000)
     cycle = 0
     j = 0
-    for iter in range(500):
+    for iter in range(100):
         for step in range(475):
             # r = reward()
             # rewards.append(r)
