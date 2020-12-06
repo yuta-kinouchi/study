@@ -41,6 +41,42 @@ def get_state():
     state = [tate,yoko,phase]
     return state
 
+def count_traveltime(id,cycle):
+    for i in id:
+        # そのIDがリストの中にあるかないかチェック
+        if i not in car_id or car_id[i][1] != cycle:
+            car_id[i] =[0, cycle]
+            
+        else:
+            car_id[i][0] += 1
+        # print(car_id[i])
+        
+def reward():
+    t_c = traci.edge.getLastStepHaltingNumber("t_c")
+    r_c = traci.edge.getLastStepHaltingNumber("r_c")
+    l_c = traci.edge.getLastStepHaltingNumber("l_c")
+    b_c = traci.edge.getLastStepHaltingNumber("b_c")
+    r =  -(t_c + r_c + l_c + b_c)/300
+    return r
+
+def state_trans(a):
+    phase = traci.trafficlight.getPhase("c")
+    # print("action:{0}".format(a))
+    # print("phase:{0}".format(phase))
+    if a == 0:
+        if phase == 0:
+            traci.trafficlight.setPhase("c",0)
+            # print("1")
+        else:
+            traci.trafficlight.setPhase("c",3)
+            # print("2")
+    elif a == 1:
+        if phase == 2:
+            traci.trafficlight.setPhase("c",2)
+            # print("1")
+        else:
+            traci.trafficlight.setPhase("c",1)
+            # print("2")
 
 #Q関数の定義
 class QNetwork:
@@ -89,19 +125,18 @@ class Memory:
     def len(self):
         return len(self.buffer)
 
-class Actor:
-    def get_action(self, state, episode, mainQN):   # [C]ｔ＋１での行動を返す
-        # 徐々に最適行動のみをとる、ε-greedy法
-        epsilon = 0.001 + 0.9 / (1.0+episode)
+def get_action(state, episode, mainQN):   # [C]ｔ＋１での行動を返す
+    # 徐々に最適行動のみをとる、ε-greedy法
+    epsilon = 0.001 + 0.9 / (1.0+episode)
 
-        if epsilon <= np.random.uniform(0, 1):
-            retTargetQs = mainQN.model.predict(state)[0]
-            action = np.argmax(retTargetQs)  # 最大の報酬を返す行動を選択する
+    if epsilon <= np.random.uniform(0, 1):
+        retTargetQs = mainQN.model.predict(state)[0]
+        action = np.argmax(retTargetQs)  # 最大の報酬を返す行動を選択する
 
-        else:
-            action = np.random.choice([0, 1])  # ランダムに行動する
+    else:
+        action = np.random.choice([0, 1])  # ランダムに行動する
 
-        return action
+    return action
 
 gamma = 0.99 
 hidden_size = 16               # Q-networkの隠れ層のニューロンの数
@@ -109,57 +144,65 @@ learning_rate = 0.00001         # Q-networkの学習係数
 memory_size = 10000            # バッファーメモリの大きさ
 batch_size = 32                # Q-networkを更新するバッチの大記載
 
+
 mainQN = QNetwork(hidden_size=hidden_size, learning_rate=learning_rate)     # メインのQネットワーク
 targetQN = QNetwork(hidden_size=hidden_size, learning_rate=learning_rate)   # 価値を計算するQネットワーク
 # plot_model(mainQN.model, to_file='Qnetwork.png', show_shapes=True)        # Qネットワークの可視化
 memory = Memory(max_size=memory_size)
-actor = Actor()
+# actor = Actor()
 
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))    
-    # traci.start(["sumo-gui", "-c", "dqn.sumocfg"])
-    traci.start(["sumo", "-c", "dqn.sumocfg"])
+    traci.start(["sumo-gui", "-c", "dqn.sumocfg"])
+    # traci.start(["sumo", "-c", "dqn.sumocfg"])
     num = 0
     cycle = 0
     travel_time = []
-    for episode in range(100)
-        for step in range(1000)
+    phase_before = 0
+    car_id = {}
+    car_id = defaultdict(list)
+    for episode in range(10):
+        for step in range(1000):
             id = traci.vehicle.getIDList()
             count_traveltime(id,cycle)
 
             # state, reward, done, _ = env.step(env.action_space.sample())
 
             phase = traci.trafficlight.getPhase("c")
-            if phase_before = phase:
+            if phase_before == phase:
                 if num == 10:
                     state = get_state()
                     state = np.reshape(state, [1, 3]) 
                     targetQN.model.set_weights(mainQN.model.get_weights())
-                    action = actor.get_action(state, episode, mainQN) 
-                    next_state, reward, done, info = env.step(action)
-                    next_state = np.reshape(next_state, [1, 3]) 
+                    action = get_action(state, episode, mainQN)
+                    state_trans(action)
+                    next_state = np.reshape(state, [1, 3]) 
                     r = reward()
                     memory.add((state, action, reward, next_state)) 
-                    state = next_state
+                    before_state = state
+                    phase_before = traci.trafficlight.getPhase("c")
                     num = -1
             else:
                 if num == 13:
                     state = get_state()
                     state = np.reshape(state, [1, 3]) 
                     targetQN.model.set_weights(mainQN.model.get_weights())
-                    action = actor.get_action(state, episode, mainQN) 
-                    next_state, reward, done, info = env.step(action)
+                    action = get_action(state, episode, mainQN)
+                    state_trans(action)
                     next_state = np.reshape(next_state, [1, 3]) 
                     r = reward()
                     memory.add((state, action, reward, next_state)) 
-                    state = next_state
+                    before_state = state
+                    phase_before = traci.trafficlight.getPhase("c")
                     num = -1
 
-            if (memory.len() > batch_size) and not islearned:
-                mainQN.replay(memory, batch_size, gamma, targetQN)
+            # if (memory.len() > batch_size) and not islearned:
+            #     mainQN.replay(memory, batch_size, gamma, targetQN)
             targetQN.model.set_weights(mainQN.model.get_weights())
             num += 1
+            traci.simulationStep()
+
 
         c = 0
         b = 1
@@ -172,4 +215,7 @@ if __name__ == "__main__":
         # print(travel_time)
         cycle += 1
 
-        traci.simulationStep()
+    plt.plot(travel_time)
+    plt.xlabel("step(×1000)")
+    plt.ylabel("travel time")
+    plt.show()

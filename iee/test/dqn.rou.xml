@@ -51,7 +51,7 @@
 <flow id="type11" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="l_b"/>
 <flow id="type12" color="1,1,0" begin="0" end="6000" vehsPerHour="200" type="car" route="l_r"/> -->
 
-<flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="t_b"/>
+<!-- <flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="t_b"/>
 <flow id="type2" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="t_r"/>
 <flow id="type3" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="t_l"/>
 <flow id="type4" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="b_t"/>
@@ -62,7 +62,12 @@
 <flow id="type9" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="r_l"/>
 <flow id="type10" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="l_t"/>
 <flow id="type11" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="l_b"/>
-<flow id="type12" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="l_r"/>
+<flow id="type12" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="l_r"/> -->
+
+<flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.2" type="car" route="b_t"/>
+<flow id="type2" color="1,1,0" begin="0" end="60000" probability="0.2" type="car" route="t_b"/>
+<flow id="type3" color="1,1,0" begin="0" end="60000" probability="0.2" type="car" route="l_r"/>
+<flow id="type4" color="1,1,0" begin="0" end="60000" probability="0.2" type="car" route="r_l"/>
 
 
 <!-- <personFlow period="10" end="60000" begin="0" id="p1">
