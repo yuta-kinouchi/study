@@ -1,0 +1,6 @@
+<configuration>
+    <input>
+       <net-file value="nine.net.xml"/>
+       <route-files value="nine.rou.xml"/>
+    </input>
+</configuration>

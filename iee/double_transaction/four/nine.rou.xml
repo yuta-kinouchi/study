@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+<!--
+  <personFlow id="p" begin="0" end="100" period="10">
+    <walk edges="l_ll rr_r"/>
+  </personFlow>
+  <personFlow id="p2" begin="0" end="100" period="10">
+    <walk edges="rr_r l_ll"/>
+  </personFlow>
+  -->
+  <vType id="car" type="passenger" accel="3.0" decel="6.0" length="5.0" minGap="2.5" maxSpeed="30.0" sigma="0.5" jmIgnoreKeepClearTime="1" jmIgnoreFoeProb="0" jmCrossingGap="5"/>
+
+  <route id = "1" edges="t1_c1 c1_c4 c4_c7 c7_b1"/>
+  <route id = "2" edges="b1_c7 c7_c4 c4_c1 c1_t1"/>
+  <route id = "3" edges="t2_c2 c2_c5 c5_c8 c8_b2"/>
+  <route id = "4" edges="b2_c8 c8_c5 c5_c2 c2_t2"/>
+  <route id = "5" edges="t3_c3 c3_c6 c6_c9 c9_b3"/>
+  <route id = "6" edges="b3_c9 c9_c6 c6_c3 c3_t3"/>
+  <route id = "7" edges="l1_c1 c1_c2 c2_c3 c3_r1"/>
+  <route id = "8" edges="r1_c3 c3_c2 c2_c1 c1_l1"/>
+  <route id = "9" edges="l2_c4 c4_c5 c5_c6 c6_r2"/>
+  <route id = "10" edges="r2_c6 c6_c5 c5_c4 c4_l2"/>
+  <route id = "11" edges="l3_c7 c7_c8 c8_c9 c9_r3"/>
+  <route id = "12" edges="r3_c9 c9_c8 c8_c7 c7_l3"/>
+
+
+
+
+
+  <!-- <vehicle depart="0" id="veh0" route="route01" type="car" color="1,0,0" /> 
+  <vehicle depart="0" id="veh1" route="route02" type="car" color="1,0,0" /> 
+  <vehicle depart="0" id="veh2" route="route03" type="car" color="1,0,0" /> 
+  <vehicle depart="0" id="veh3" route="route04" type="car" color="1,0,0" />  -->
+
+<flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="1"/>
+<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="2"/>
+<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="3"/>
+<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="4"/>
+<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="5"/>
+<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="6"/>
+<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="7"/>
+<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="8"/>
+<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="9"/>
+<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="10"/>
+<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="11"/>
+<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.3" type="car" route="12"/>
+
+
+<!-- <personFlow period="10" end="60000" begin="0" id="p1">
+<walk edges="rr_r l_ll"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p2">
+<walk edges="l_ll rr_r "/>
+</personFlow>
+
+<personFlow period="10" end="60000" begin="0" id="p3">
+<walk edges="ll_l r_rr"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p4">
+<walk edges="r_rr ll_l "/>
+</personFlow>
+
+<personFlow period="10" end="60000" begin="0" id="p5">
+<walk edges="tt_c b_bb"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p6">
+<walk edges="b_bb tt_c"/>
+</personFlow>
+
+<personFlow period="10" end="60000" begin="0" id="p7">
+<walk edges="bb_b t_tt"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p8">
+<walk edges="t_tt bb_b"/>
+</personFlow> -->
+
+</routes>
