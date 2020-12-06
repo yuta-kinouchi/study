@@ -44,7 +44,7 @@ def get_state():
 
 #Q関数の定義
 class QNetwork:
-    def __init__(self, learning_rate=0.01, state_size=4, action_size=2, hidden_size=10):
+    def __init__(self, learning_rate=0.01, state_size=3, action_size=2, hidden_size=10):
         self.model = Sequential()
         self.model.add(Dense(hidden_size, activation='relu', input_dim=state_size))
         self.model.add(Dense(hidden_size, activation='relu'))
@@ -54,7 +54,7 @@ class QNetwork:
         self.model.compile(loss=huberloss, optimizer=self.optimizer)
         
     def replay(self, memory, batch_size, gamma, targetQN):
-        inputs = np.zeros((batch_size, 4))
+        inputs = np.zeros((batch_size, 3))
         targets = np.zeros((batch_size, 2))
         mini_batch = memory.sample(batch_size)
 
