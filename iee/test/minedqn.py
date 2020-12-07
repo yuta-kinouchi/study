@@ -180,8 +180,8 @@ if __name__ == "__main__":
                     state = np.reshape(state, [1, 3]) 
                     before_action = action
                     action = get_action(state, episode, mainQN)
-                    reward = reward()
-                    memory.add((before_state, before_action, reward, state)) 
+                    r = reward()
+                    memory.add((before_state, before_action, r, state)) 
                     state_trans(action)
                     # state = np.reshape(state, [1, 3]) 
                     phase_before = traci.trafficlight.getPhase("c")
@@ -193,8 +193,8 @@ if __name__ == "__main__":
                     state = np.reshape(state, [1, 3]) 
                     before_action = action
                     action = get_action(state, episode, mainQN)
-                    reward = reward()
-                    memory.add((before_state, before_action, reward, state)) 
+                    r = reward()
+                    memory.add((before_state, before_action, r, state)) 
                     state_trans(action)
                     # next_state = np.reshape(next_state, [1, 3]) 
                     phase_before = traci.trafficlight.getPhase("c")
