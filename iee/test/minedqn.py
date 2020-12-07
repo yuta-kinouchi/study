@@ -59,6 +59,17 @@ def reward():
     r =  -(t_c + r_c + l_c + b_c)/300
     return r
 
+def get_action(state, episode, mainQN):   # [C]ｔ＋１での行動を返す
+    # 徐々に最適行動のみをとる、ε-greedy法
+    # epsilon = 0.001 + 0.9 / (1.0+episode)
+    epsilon = 0.1
+    if epsilon <= np.random.uniform(0, 1):
+        retTargetQs = mainQN.model.predict(state)[0]
+        action = np.argmax(retTargetQs)  # 最大の報酬を返す行動を選択する
+    else:
+        action = np.random.choice([0, 1])  # ランダムに行動する
+    return action
+
 def state_trans(a):
     phase = traci.trafficlight.getPhase("c")
     # print("action:{0}".format(a))
@@ -66,17 +77,17 @@ def state_trans(a):
     if a == 0:
         if phase == 0:
             traci.trafficlight.setPhase("c",0)
-            # print("1")
+            print("1")
         else:
             traci.trafficlight.setPhase("c",3)
-            # print("2")
+            print("2")
     elif a == 1:
         if phase == 2:
             traci.trafficlight.setPhase("c",2)
-            # print("1")
+            print("1")
         else:
             traci.trafficlight.setPhase("c",1)
-            # print("2")
+            print("2")
 
 #Q関数の定義
 class QNetwork:
@@ -125,19 +136,7 @@ class Memory:
     def len(self):
         return len(self.buffer)
 
-def get_action(state, episode, mainQN):   # [C]ｔ＋１での行動を返す
-    # 徐々に最適行動のみをとる、ε-greedy法
-    # epsilon = 0.001 + 0.9 / (1.0+episode)
-    epsilon = 0.1
 
-    if epsilon <= np.random.uniform(0, 1):
-        retTargetQs = mainQN.model.predict(state)[0]
-        action = np.argmax(retTargetQs)  # 最大の報酬を返す行動を選択する
-
-    else:
-        action = np.random.choice([0, 1])  # ランダムに行動する
-
-    return action
 
 gamma = 0.99 
 hidden_size = 16               # Q-networkの隠れ層のニューロンの数
