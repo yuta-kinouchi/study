@@ -127,7 +127,8 @@ class Memory:
 
 def get_action(state, episode, mainQN):   # [C]ｔ＋１での行動を返す
     # 徐々に最適行動のみをとる、ε-greedy法
-    epsilon = 0.001 + 0.9 / (1.0+episode)
+    # epsilon = 0.001 + 0.9 / (1.0+episode)
+    epsilon = 0.1
 
     if epsilon <= np.random.uniform(0, 1):
         retTargetQs = mainQN.model.predict(state)[0]
@@ -160,6 +161,8 @@ if __name__ == "__main__":
     cycle = 0
     travel_time = []
     phase_before = 0
+    state = get_state()
+    action = 0
     car_id = {}
     car_id = defaultdict(list)
     for episode in range(10):
@@ -172,28 +175,30 @@ if __name__ == "__main__":
             phase = traci.trafficlight.getPhase("c")
             if phase_before == phase:
                 if num == 10:
+                    before_state = state
                     state = get_state()
                     state = np.reshape(state, [1, 3]) 
+                    before_action = action
                     targetQN.model.set_weights(mainQN.model.get_weights())
                     action = get_action(state, episode, mainQN)
+                    memory.add((before_state, before_action, reward, state)) 
                     state_trans(action)
-                    next_state = np.reshape(state, [1, 3]) 
+                    # state = np.reshape(state, [1, 3]) 
                     r = reward()
-                    memory.add((state, action, reward, next_state)) 
-                    before_state = state
                     phase_before = traci.trafficlight.getPhase("c")
                     num = -1
             else:
                 if num == 13:
+                    before_state = state
                     state = get_state()
                     state = np.reshape(state, [1, 3]) 
+                    before_action = action
                     targetQN.model.set_weights(mainQN.model.get_weights())
                     action = get_action(state, episode, mainQN)
-                    state_trans(action)
-                    next_state = np.reshape(next_state, [1, 3]) 
-                    r = reward()
                     memory.add((state, action, reward, next_state)) 
-                    before_state = state
+                    state_trans(action)
+                    # next_state = np.reshape(next_state, [1, 3]) 
+                    r = reward()
                     phase_before = traci.trafficlight.getPhase("c")
                     num = -1
 
