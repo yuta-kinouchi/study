@@ -165,6 +165,7 @@ if __name__ == "__main__":
     action = 0
     car_id = {}
     car_id = defaultdict(list)
+    targetQN.model.set_weights(mainQN.model.get_weights())
     for episode in range(10):
         for step in range(1000):
             id = traci.vehicle.getIDList()
@@ -179,12 +180,11 @@ if __name__ == "__main__":
                     state = get_state()
                     state = np.reshape(state, [1, 3]) 
                     before_action = action
-                    targetQN.model.set_weights(mainQN.model.get_weights())
                     action = get_action(state, episode, mainQN)
+                    reward = reward()
                     memory.add((before_state, before_action, reward, state)) 
                     state_trans(action)
                     # state = np.reshape(state, [1, 3]) 
-                    r = reward()
                     phase_before = traci.trafficlight.getPhase("c")
                     num = -1
             else:
@@ -193,12 +193,11 @@ if __name__ == "__main__":
                     state = get_state()
                     state = np.reshape(state, [1, 3]) 
                     before_action = action
-                    targetQN.model.set_weights(mainQN.model.get_weights())
                     action = get_action(state, episode, mainQN)
-                    memory.add((state, action, reward, next_state)) 
+                    reward = reward()
+                    memory.add((before_state, before_action, reward, state)) 
                     state_trans(action)
                     # next_state = np.reshape(next_state, [1, 3]) 
-                    r = reward()
                     phase_before = traci.trafficlight.getPhase("c")
                     num = -1
 
