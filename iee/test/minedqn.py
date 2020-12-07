@@ -77,17 +77,13 @@ def state_trans(a):
     if a == 0:
         if phase == 0:
             traci.trafficlight.setPhase("c",0)
-            print("1")
         else:
             traci.trafficlight.setPhase("c",3)
-            print("2")
     elif a == 1:
         if phase == 2:
             traci.trafficlight.setPhase("c",2)
-            print("1")
         else:
             traci.trafficlight.setPhase("c",1)
-            print("2")
 
 #Q関数の定義
 class QNetwork:
@@ -201,8 +197,8 @@ if __name__ == "__main__":
                     num = -1
 
             # if (memory.len() > batch_size) and not islearned:
-            #     mainQN.replay(memory, batch_size, gamma, targetQN)
-            targetQN.model.set_weights(mainQN.model.get_weights())
+            mainQN.replay(memory, batch_size, gamma, targetQN)
+            # targetQN.model.set_weights(mainQN.model.get_weights())
             num += 1
             traci.simulationStep()
 
