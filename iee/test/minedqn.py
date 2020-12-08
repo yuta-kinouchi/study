@@ -150,13 +150,14 @@ memory = Memory(max_size=memory_size)
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))    
-    traci.start(["sumo-gui", "-c", "dqn.sumocfg"])
-    # traci.start(["sumo", "-c", "dqn.sumocfg"])
+    # traci.start(["sumo-gui", "-c", "dqn.sumocfg"])
+    traci.start(["sumo", "-c", "dqn.sumocfg"])
     num = 0
     cycle = 0
     travel_time = []
     phase_before = 0
     state = get_state()
+    state = np.reshape(state, [1, 3]) 
     action = 0
     car_id = {}
     car_id = defaultdict(list)
@@ -196,8 +197,8 @@ if __name__ == "__main__":
                     phase_before = traci.trafficlight.getPhase("c")
                     num = -1
 
-            # if (memory.len() > batch_size) and not islearned:
-            mainQN.replay(memory, batch_size, gamma, targetQN)
+            if memory.len() > batch_size:
+                mainQN.replay(memory, batch_size, gamma, targetQN)
             # targetQN.model.set_weights(mainQN.model.get_weights())
             num += 1
             traci.simulationStep()
