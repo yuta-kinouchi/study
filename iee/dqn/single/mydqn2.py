@@ -14,8 +14,16 @@ import pickle
 import xml.etree.ElementTree as ET
 import numpy as np
 import matplotlib.pyplot as plt
-import traci
 from collections import defaultdict
+
+import os, sys
+if 'SUMO_HOME' in os.environ:
+    tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
+    sys.path.append(tools)
+else:
+    sys.exit("please declare environment variable 'SUMO_HOME'")
+
+import traci
 
 #損失関数を定義している
 def huberloss(y_true, y_pred):
@@ -66,8 +74,12 @@ def get_action(state, episode, mainQN):   # [C]ｔ＋１での行動を返す
     if epsilon <= np.random.uniform(0, 1):
         retTargetQs = mainQN.model.predict(state)[0]
         action = np.argmax(retTargetQs)  # 最大の報酬を返す行動を選択する
+        print("A")
+        print(action)
     else:
         action = np.random.choice([0, 1])  # ランダムに行動する
+        print("B")
+        print(action)
     return action
 
 def state_trans(a):
@@ -100,7 +112,6 @@ class QNetwork:
         inputs = np.zeros((batch_size, 3))
         targets = np.zeros((batch_size, 2))
         mini_batch = memory.sample(batch_size)
-
         for i, (state_b, action_b, reward_b, next_state_b) in enumerate(mini_batch):
             inputs[i:i + 1] = state_b
             target = reward_b
@@ -150,8 +161,8 @@ memory = Memory(max_size=memory_size)
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))    
-    # traci.start(["sumo-gui", "-c", "dqn.sumocfg"])
-    traci.start(["sumo", "-c", "dqn.sumocfg"])
+    traci.start(["sumo-gui", "-c", "dqn.sumocfg"])
+    # traci.start(["sumo", "-c", "dqn.sumocfg"])
     num = 0
     cycle = 0
     travel_time = []
