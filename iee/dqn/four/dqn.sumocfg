@@ -1,0 +1,6 @@
+<configuration>
+    <input>
+       <net-file value="four.net.xml"/>
+       <route-files value="four.rou.xml"/>
+    </input>
+</configuration>
