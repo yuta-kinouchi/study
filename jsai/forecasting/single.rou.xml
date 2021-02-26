@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+<!--
+  <personFlow id="p" begin="0" end="100" period="10">
+    <walk edges="c_l r_c"/>
+  </personFlow>
+  <personFlow id="p2" begin="0" end="100" period="10">
+    <walk edges="r_c c_l"/>
+  </personFlow>
+  -->
+  <vType id="car" type="passenger" accel="3.0" decel="6.0" length="5.0" minGap="2.5" maxSpeed="30.0" sigma="0.5" jmIgnoreKeepClearTime="1" jmIgnoreFoeProb="0" jmCrossingGap="5"/>
+
+  <route id="t_b" edges="t_c c_b"/>
+  <route id="t_r" edges="t_c c_r"/>
+  <route id="t_l" edges="t_c c_l"/>
+
+  <route id="b_t" edges="b_c c_t"/>
+  <route id="b_r" edges="b_c c_r"/>
+  <route id="b_l" edges="b_c c_l"/>
+
+  <route id="r_t" edges="r_c c_t"/>
+  <route id="r_b" edges="r_c c_b"/>
+  <route id="r_l" edges="r_c c_l"/>
+
+  <route id="l_t" edges="l_c c_t"/>
+  <route id="l_b" edges="l_c c_b"/>
+  <route id="l_r" edges="l_c c_r"/>
+
+
+<!--
+  <vehicle depart="0" id="veh0" route="route01" type="car" color="1,0,0" /> 
+  <vehicle depart="0" id="veh1" route="route02" type="car" color="1,0,0" /> 
+  <vehicle depart="0" id="veh2" route="route03" type="car" color="1,0,0" /> 
+  <vehicle depart="0" id="veh3" route="route04" type="car" color="1,0,0" /> 
+
+<flow id="type1" color="1,1,0" begin="0" end="100" period="10" type="car" route="route01"/>
+<flow id="type2" color="1,1,0" begin="0" end="100" period="10" type="car" route="route02"/>
+<flow id="type3" color="1,1,0" begin="0" end="100" period="10" type="car" route="route03"/>
+<flow id="type4" color="1,1,0" begin="0" end="100" period="10" type="car" route="route04"/>
+  -->
+<!-- <flow id="type1" color="1,1,0" begin="0" end="6000" vehsPerHour="200" type="car" route="t_b"/>
+<flow id="type2" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="t_r"/>
+<flow id="type3" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="t_l"/>
+<flow id="type4" color="1,1,0" begin="0" end="6000" vehsPerHour="200" type="car" route="b_t"/>
+<flow id="type5" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="b_r"/>
+<flow id="type6" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="b_l"/>
+<flow id="type7" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="r_t"/>
+<flow id="type8" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="r_b"/>
+<flow id="type9" color="1,1,0" begin="0" end="6000" vehsPerHour="200" type="car" route="r_l"/>
+<flow id="type10" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="l_t"/>
+<flow id="type11" color="1,1,0" begin="0" end="6000" vehsPerHour="100" type="car" route="l_b"/>
+<flow id="type12" color="1,1,0" begin="0" end="6000" vehsPerHour="200" type="car" route="l_r"/> -->
+
+<!-- <flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="t_b"/>
+<flow id="type2" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="t_r"/>
+<flow id="type3" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="t_l"/>
+<flow id="type4" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="b_t"/>
+<flow id="type5" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="b_r"/>
+<flow id="type6" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="b_l"/>
+<flow id="type7" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="r_t"/>
+<flow id="type8" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="r_b"/>
+<flow id="type9" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="r_l"/>
+<flow id="type10" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="l_t"/>
+<flow id="type11" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="l_b"/>
+<flow id="type12" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="l_r"/> -->
+
+<flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.01" type="car" route="b_t"/>
+<flow id="type2" color="1,1,0" begin="0" end="60000" probability="0.01" type="car" route="t_b"/>
+<flow id="type3" color="1,1,0" begin="0" end="60000" probability="0.01" type="car" route="l_r"/>
+<flow id="type4" color="1,1,0" begin="0" end="60000" probability="0.01" type="car" route="r_l"/>
+
+
+<!-- <personFlow period="10" end="60000" begin="0" id="p1">
+<walk edges="r_c c_l"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p2">
+<walk edges="c_l r_c "/>
+</personFlow>
+
+<personFlow period="10" end="60000" begin="0" id="p3">
+<walk edges="l_c c_r"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p4">
+<walk edges="c_r l_c "/>
+</personFlow>
+
+<personFlow period="10" end="60000" begin="0" id="p5">
+<walk edges="t_c c_b"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p6">
+<walk edges="c_b t_c"/>
+</personFlow>
+
+<personFlow period="10" end="60000" begin="0" id="p7">
+<walk edges="b_c c_t"/>
+</personFlow>
+<personFlow period="10" end="60000" begin="0" id="p8">
+<walk edges="c_t b_c"/>
+</personFlow> -->
+
+</routes>
