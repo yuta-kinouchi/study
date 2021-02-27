@@ -4,6 +4,7 @@ Both discrete and continuous action spaces are supported.
 To solve CartPole-v0, run:
 python train_ppo_gym.py --env CartPole-v0
 """
+import sys
 import argparse
 import chainer
 from chainer import functions as F
@@ -74,7 +75,7 @@ def main():
    parser.add_argument('--bound-mean', action='store_true')
    parser.add_argument('--seed', type=int, default=np.random.randint(0,2**16),
                        help='Random seed [0, 2 ** 32)')
-   parser.add_argument('--outdir', type=str, default='results2',
+   parser.add_argument('--outdir', type=str, default='results',
                        help='Directory path to save output files.'
                             ' If it does not exist, it will be created.')
 # ここの数を変更して、エピソード数を調節
@@ -94,6 +95,9 @@ def main():
    parser.add_argument('--batchsize', type=int, default=64)
    parser.add_argument('--epochs', type=int, default=10)
    parser.add_argument('--entropy-coef', type=float, default=0.0)
+
+   parser.add_argument('--history_len', type=int, default=40)
+
    # 引数の解析を行っている
    args = parser.parse_args()
     # loggingを用いてログをとっている
@@ -102,7 +106,7 @@ def main():
    misc.set_random_seed(args.seed, gpus=(args.gpu,))
    args.outdir = experiments.prepare_output_dir(args, args.outdir)
    def make_env(test):
-       env = gym.make(args.env)
+       env = gym.make(args.env,history_len = args.history_len)
        # Use different random seeds for train and test envs
        #env_seed = 2 ** 32 - 1 - args.seed if test else args.seed
        #env.seed(env_seed)
@@ -118,7 +122,7 @@ def main():
        #    env = chainerrl.wrappers.Render(env)
        return env
 
-   sample_env = gym.make(args.env)
+   sample_env =make_env(True)
    timestep_limit = sample_env.spec.max_episode_steps
    obs_space = sample_env.observation_space
    action_space = sample_env.action_space

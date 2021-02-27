@@ -16,7 +16,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 
 class SumoEnv(gym.Env):
-    def __init__(self):
+    def __init__(self,history_len):
         super().__init__()
         # action_space, observation_space, reward_range を設定する
         self.action_space = gym.spaces.Discrete(4)
@@ -27,13 +27,14 @@ class SumoEnv(gym.Env):
         )
         self.reward_range = [-1., 1.]
         self.started = False
-        self.reset()
         self.time = 0
         self.tf = [0,0,0]
         self.idlist = {}
         self.idlist = defaultdict(list)
         self.travel_time = []
         self.episode = 0
+        self.history_len = history_len
+        self.reset()
        #self.lane_dict = {"gneE1_0": [0, 0, 0, 0, 1], "gne"}
 
     def reset(self):
@@ -51,12 +52,15 @@ class SumoEnv(gym.Env):
         self.car_id = {}
         self.car_id = defaultdict(list)
         self.feature = [[],[],[],[],[],[],[],[]]
-        # for i in range(1000):
-        #     self.tf = self.choice_trafficflow()
-        #     if self.time % 300 == 0:
-        #         self.tf = self.choice_trafficflow()
-        #     self.add_car(self.tf,self.time)
-        #     self.time += 1
+        x = 10000
+        for i in range(1000):
+            traci.simulationStep()
+            if i % 10 == 0:
+                self.get_feature()
+            if i % 400 == 0:
+                self.tf = self.choice_trafficflow()
+            self.add_car(self.tf,x)
+            x += 1
         return self.get_state()
 
     def state_trans(self,a):
@@ -131,6 +135,7 @@ class SumoEnv(gym.Env):
         id_b_r = traci.lane.getLastStepVehicleIDs("b_c_2")
         id_r_r = traci.lane.getLastStepVehicleIDs("r_c_2")
         id_l_r = traci.lane.getLastStepVehicleIDs("l_c_2")
+        # print(id_t)
         t = 0
         b = 0
         r = 0
@@ -165,21 +170,30 @@ class SumoEnv(gym.Env):
                 self.idlist[i][0] = 1
 
         for i in id_t_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 t_r += 1
+            else:
+                self.idlist[i][0] = 1
         for i in id_b_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 b_r += 1
+            else:
+                self.idlist[i][0] = 1
         for i in id_r_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 r_r += 1
+            else:
+                self.idlist[i][0] = 1
         for i in id_l_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 l_r += 1
+            else:
+                self.idlist[i][0] = 1
+
 
         self.feature[0].append(t)
         self.feature[1].append(b)
@@ -205,7 +219,7 @@ class SumoEnv(gym.Env):
         self.get_feature()
         reward = self._get_reward(next_s, action)
         t = traci.simulation.getTime()
-        if t >= 3600:
+        if t >= 4600:
             a = 0
             b = 1
             for i in self.car_id:
@@ -286,7 +300,8 @@ class SumoEnv(gym.Env):
             phase = [0,0,1,0]
         else:
             phase = [0,0,0,1]
-        if len(self.feature[0]) >= 60:
+        # print(self.history_len)
+        if len(self.feature[0]) >= self.history_len:
             f = [[],[],[],[]]
             f__l = [[],[],[],[]]
             f_t = 0
@@ -297,7 +312,7 @@ class SumoEnv(gym.Env):
             f_b_l = 0
             f_r_l = 0
             f_l_l = 0
-            for i in range(60):
+            for i in range(self.history_len):
                 f_t += self.feature[0][-i] 
                 f_b += self.feature[1][-i] 
                 f_r += self.feature[2][-i] 
@@ -306,9 +321,10 @@ class SumoEnv(gym.Env):
                 f_b_l += self.feature[5][-i] 
                 f_r_l += self.feature[6][-i] 
                 f_l_l += self.feature[7][-i] 
-        else:
-            state = [r_c,l_c,t_c,b_c,r_c_l,l_c_l,t_c_l,b_c_l,phase[0],phase[1],phase[2],phase[3],0,0,0,0,0,0,0,0]
-            return np.array(state, dtype="float32")
+        # else:
+        #     state = [r_c,l_c,t_c,b_c,r_c_l,l_c_l,t_c_l,b_c_l,phase[0],phase[1],phase[2],phase[3],0,0,0,0,0,0,0,0]
+        #     # print(state)
+        #     return np.array(state, dtype="float32")
         f[0] = f_t
         f[1] = f_b
         f[2] = f_r

@@ -33,8 +33,6 @@ class SumoEnv2(gym.Env):
         self.tf = [0,0,0]
         self.travel_time = []
         self.cycle = 0
-        self.car_id = {}
-        self.car_id = defaultdict(list)
         self.episode = 0
        #self.lane_dict = {"gneE1_0": [0, 0, 0, 0, 1], "gne"}
 
@@ -42,12 +40,47 @@ class SumoEnv2(gym.Env):
         if self.started:
             traci.close()
         # traci.start(["sumo-gui", "-c", os.path.expanduser("../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
-        traci.start(["sumo", "-c", os.path.expanduser("../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
+        traci.start(["sumo", "-c", os.path.expanduser("../../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
         # while "0" not in traci.vehicle.getIDList():
         #     traci.simulationStep()
         self.started = True
         self.s = 0
         self.done = False
+        self.car_id = {}
+        self.car_id = defaultdict(list)
+        self.idlist = {}
+        self.idlist = defaultdict(list)
+        x = 10000
+        s = 0
+        for i in range(1000):
+            traci.simulationStep()
+            if i % 10 == 0:
+                self.get_feature()
+            x = str(x)
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID= x + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                s += 1
+                if np.random.uniform(0,1)  > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+            x = int(x)
+            x += 1
         return self.get_state()
 
     # def step(self, action):
@@ -81,18 +114,24 @@ class SumoEnv2(gym.Env):
             else:
                 traci.trafficlight.setPhase("c",9)
                 for i in range(3):
+                    self.count_traveltime(id,self.cycle)
+                    self.time += 1
                     traci.simulationStep()
                 traci.trafficlight.setPhase("c",0)
         elif a == 1:
             if phase == 0:
                 traci.trafficlight.setPhase("c",1)
                 for i in range(3):
+                    self.count_traveltime(id,self.cycle)
+                    self.time += 1
                     traci.simulationStep()
             elif phase == 2:
                 traci.trafficlight.setPhase("c",2)
             else:
                 traci.trafficlight.setPhase("c",9)
                 for i in range(3):
+                    self.count_traveltime(id,self.cycle)
+                    self.time += 1
                     traci.simulationStep()
                 traci.trafficlight.setPhase("c",2)
         elif a == 2:
@@ -101,18 +140,24 @@ class SumoEnv2(gym.Env):
             else:
                 traci.trafficlight.setPhase("c",8)
                 for i in range(3):
+                    self.count_traveltime(id,self.cycle)
+                    self.time += 1
                     traci.simulationStep()
                 traci.trafficlight.setPhase("c",4)
         else:
             if phase == 4:
                 traci.trafficlight.setPhase("c",5)
                 for i in range(3):
+                    self.count_traveltime(id,self.cycle)
+                    self.time += 1
                     traci.simulationStep()
             elif phase == 6:
                 traci.trafficlight.setPhase("c",6)
             else:
                 traci.trafficlight.setPhase("c",8)
                 for i in range(3):
+                    self.count_traveltime(id,self.cycle)
+                    self.time += 1
                     traci.simulationStep()
                 traci.trafficlight.setPhase("c",6)
 
@@ -125,13 +170,13 @@ class SumoEnv2(gym.Env):
 
     def count_traveltime(self,id,cycle):
         for i in id:
-            if i not in self.car_id or self.car_id[i][1] != cycle:
-                self.car_id[i] =[0, cycle]
+            if i not in self.car_id :
+                self.car_id[i] =[1]
             else:
                 self.car_id[i][0] += 1
 
     def step(self,action):
-        if self.time % 300 == 0:
+        if self.time % 400 == 0:
             self.tf = self.choice_trafficflow()
         self.state_trans(action)
         for i in range(10):
@@ -144,13 +189,11 @@ class SumoEnv2(gym.Env):
         reward = self._get_reward(next_s, action)
         t = traci.simulation.getTime()
 
-        if t >= 3600:
             a = 0
             b = 1
             for i in self.car_id:
-                if self.car_id[i][1] == self.cycle:
-                    a += self.car_id[i][0]
-                    b += 1
+                a += self.car_id[i][0]
+                b += 1
             traveltime = a / b
             self.travel_time.append(traveltime)
             self.cycle += 1

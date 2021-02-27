@@ -17,25 +17,23 @@ import matplotlib.pyplot as plt
 import statistics
 
 class SumoEnv2(gym.Env):
-    def __init__(self):
+    def __init__(self,history_len):
         super().__init__()
         # action_space, observation_space, reward_range を設定する
         self.action_space = gym.spaces.Discrete(4)
         self.observation_space = gym.spaces.Box(
             low=0,
-            high=100,
+            high=150,
             shape=(20,)
         )
         self.reward_range = [-1., 1.]
         self.started = False
         self.reset()
-        self.time = 0
         self.tf = [0,0,0]
-        self.idlist = {}
-        self.idlist = defaultdict(list)
         self.travel_time = []
         self.episode = 0
-       #self.lane_dict = {"gneE1_0": [0, 0, 0, 0, 1], "gne"}
+
+      #self.lane_dict = {"gneE1_0": [0, 0, 0, 0, 1], "gne"}
 
     def reset(self):
         if self.started:
@@ -51,6 +49,52 @@ class SumoEnv2(gym.Env):
         self.cycle = 0
         self.car_id = {}
         self.car_id = defaultdict(list)
+        self.a = []
+        self.b = []
+        self.c = []
+        self.d = []
+        self.e = []
+        self.f = []
+        self.g = []
+        self.h = []
+        self.i = []
+        self.j = []
+        self.k = []
+
+        self.time = 0
+        self.idlist = {}
+        self.idlist = defaultdict(list)
+        x = 10000
+        s = 0
+        for i in range(1000):
+            traci.simulationStep()
+            if i % 10 == 0:
+                self.get_feature()
+            x = str(x)
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID= x + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                s += 1
+                if np.random.uniform(0,1)  > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+            x = int(x)
+            x += 1
         return self.get_state()
 
 
@@ -66,6 +110,7 @@ class SumoEnv2(gym.Env):
                 for i in range(3):
                     traci.simulationStep()
                     self.count_traveltime(id,self.cycle)
+                    self.time += 1
                 traci.trafficlight.setPhase("c",0)
         elif a == 1:
             if phase == 0:
@@ -73,6 +118,7 @@ class SumoEnv2(gym.Env):
                 for i in range(3):
                     traci.simulationStep()
                     self.count_traveltime(id,self.cycle)
+                    self.time += 1
             elif phase == 2:
                 traci.trafficlight.setPhase("c",2)
             else:
@@ -80,6 +126,7 @@ class SumoEnv2(gym.Env):
                 for i in range(3):
                     traci.simulationStep()
                     self.count_traveltime(id,self.cycle)
+                    self.time += 1
                 traci.trafficlight.setPhase("c",2)
         elif a == 2:
             if phase == 4 or phase == 6:
@@ -89,6 +136,7 @@ class SumoEnv2(gym.Env):
                 for i in range(3):
                     traci.simulationStep()
                     self.count_traveltime(id,self.cycle)
+                    self.time += 1
                 traci.trafficlight.setPhase("c",4)
         else:
             if phase == 4:
@@ -96,6 +144,7 @@ class SumoEnv2(gym.Env):
                 for i in range(3):
                     traci.simulationStep()
                     self.count_traveltime(id,self.cycle)
+                    self.time += 1
             elif phase == 6:
                 traci.trafficlight.setPhase("c",6)
             else:
@@ -103,6 +152,7 @@ class SumoEnv2(gym.Env):
                 for i in range(3):
                     traci.simulationStep()
                     self.count_traveltime(id,self.cycle)
+                    self.time += 1
                 traci.trafficlight.setPhase("c",6)
 
     def choice_trafficflow(self):
@@ -129,6 +179,7 @@ class SumoEnv2(gym.Env):
         id_b_r = traci.lane.getLastStepVehicleIDs("b_c_2")
         id_r_r = traci.lane.getLastStepVehicleIDs("r_c_2")
         id_l_r = traci.lane.getLastStepVehicleIDs("l_c_2")
+        # print(id_t)
         t = 0
         b = 0
         r = 0
@@ -163,21 +214,45 @@ class SumoEnv2(gym.Env):
                 self.idlist[i][0] = 1
 
         for i in id_t_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 t_r += 1
+            else:
+                self.idlist[i][0] = 1
         for i in id_b_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 b_r += 1
+            else:
+                self.idlist[i][0] = 1
         for i in id_r_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 r_r += 1
+            else:
+                self.idlist[i][0] = 1
         for i in id_l_r:
-            if self.idlist[i][1] == 0:
-                self.idlist[i][1] = 1
+            if i not in self.idlist:
+                self.idlist[i] = [0,0]
                 l_r += 1
+            else:
+                self.idlist[i][0] = 1
+        # for i in id_t_r:
+        #     if self.idlist[i][1] == 0:
+        #         self.idlist[i][1] = 1
+        #         t_r += 1
+        # for i in id_b_r:
+        #     if self.idlist[i][1] == 0:
+        #         self.idlist[i][1] = 1
+        #         b_r += 1
+        # for i in id_r_r:
+        #     if self.idlist[i][1] == 0:
+        #         self.idlist[i][1] = 1
+        #         r_r += 1
+        # for i in id_l_r:
+        #     if self.idlist[i][1] == 0:
+        #         self.idlist[i][1] = 1
+        #         l_r += 1
 
         self.feature[0].append(t)
         self.feature[1].append(b)
@@ -187,6 +262,8 @@ class SumoEnv2(gym.Env):
         self.feature[5].append(b_r)
         self.feature[6].append(r_r)
         self.feature[7].append(l_r)
+        # print(self.feature[0])
+        # print(self.feature)
 
     def step(self,action):
         if self.time % 400 == 0:
@@ -194,7 +271,7 @@ class SumoEnv2(gym.Env):
         self.state_trans(action)
         for i in range(10):
             traci.simulationStep()
-            self.add_car(self.time)
+            self.add_car(self.tf,self.time)
             id = traci.vehicle.getIDList()
             self.count_traveltime(id,self.cycle)
             self.time += 1
@@ -202,7 +279,9 @@ class SumoEnv2(gym.Env):
         self.get_feature()
         reward = self._get_reward(next_s, action)
         t = traci.simulation.getTime()
-        if t >= 3600:
+        # print("---------------------------------")
+
+        if t >= 4600:
             a = 0
             b = 1
             for i in self.car_id:
@@ -213,6 +292,76 @@ class SumoEnv2(gym.Env):
             self.cycle += 1
             self.done = True
             self.episode += 1
+            if self.episode == 2:
+                # fig = plt.figure()
+                # ax = fig.add_subplot(111)
+                # ax.set_xlabel("epiosde", size = 14, weight = "light")
+                # ax.set_xlabel("travel time", size = 14, weight = "light")
+                # ax = fig.add_subplot(1, 1, 1)
+                # ax.plot(self.travel_time)
+                # plt.show()
+                # print(self.feature[0])
+                syaryou =[]
+                j = 0
+                for i in range(300):
+                    if i <= 33:
+                        syaryou.append(0.05)
+                    elif i <= 66:
+                        syaryou.append(0.10)
+                    elif i <= 99:
+                        syaryou.append(0.15)
+                    elif i <= 132:
+                        syaryou.append(0.20)
+                    elif i <= 165:
+                        syaryou.append(0.20)
+                    elif i <= 198:
+                        syaryou.append(0.15)
+                    elif i <= 231:
+                        syaryou.append(0.10)
+                    elif i <= 264:
+                        syaryou.append(0.05)
+                    elif i <= 300:
+                        syaryou.append(0.05)
+                fig = plt.figure()
+                ax = fig.add_subplot(111)
+                ax.set_xlabel("epiosde", size = 14, weight = "light")
+                ax.set_xlabel("travel time", size = 14, weight = "light")
+                ax = fig.add_subplot(1, 1, 1)
+                self.a = [n/100 for n in self.a]
+                self.b = [n/200 for n in self.b]
+                self.c = [n/300 for n in self.c]
+                self.d = [n/400 for n in self.d]
+                self.e = [n/500 for n in self.e]
+                self.f = [n/600 for n in self.f]
+                self.g = [n/700 for n in self.g]
+                self.h = [n/800 for n in self.h]
+                self.i = [n/900 for n in self.i]
+                self.j = [n/1000 for n in self.j]
+                l1,l2,l3,l4,l5,l6,l7,l8,l9,l10,l11 = "100","200","300","400","500","600","700","800","900","1000","syaryou"
+                # ax.plot(self.a,label = l1)
+                ax.plot(self.b,label = l2)
+                # ax.plot(self.c,label = l3)
+                ax.plot(self.d,label = l4)
+                # ax.plot(self.e,label = l5)
+                ax.plot(self.f,label = l6)
+                # ax.plot(self.g,label = l7)
+                # ax.plot(self.h,label = l8)
+                # ax.plot(self.i,label = l9)
+                # ax.plot(self.j,label = l10)
+                ax.plot(syaryou,label = l11)
+                plt.legend(loc='upper right')
+                plt.show()
+
+            #     fig = plt.figure()
+            #     ax = fig.add_subplot(111)
+            #     ax.set_xlabel("epiosde", size = 14, weight = "light")
+            #     ax.set_xlabel("travel time", size = 14, weight = "light")
+            #     ax = fig.add_subplot(1, 1, 1)
+            #     self.k = [n/600 for n in self.k]
+            #     # l1,l2,l3,l4,l5,l6,l7,l8,l9,l10 = "100","200","300","400","500","600","700","800","900","1000"
+            #     ax.plot(self.k)
+            #     # plt.legend(loc='lower right')
+            #     plt.show()
             if self.episode == 10:
                 mean = statistics.mean(self.travel_time)
                 variance = statistics.variance(self.travel_time)
@@ -227,90 +376,49 @@ class SumoEnv2(gym.Env):
                 ax = fig.add_subplot(1, 1, 1)
                 ax.plot(self.travel_time)
                 plt.show()
+                print(self.feature[0])
         return next_s, np.array(reward), self.done, {}
 
-    def add_car(self,step):
-        # テスト環境として相応しい交通流を作成する
-        y = int(step)
+    def add_car(self,tf,step):
         x = str(step)
-        # if tf[0] == 0:
-        #     p = 0.125
-        # elif tf[0] == 1:
-        #     p = 0.25
-        # elif tf[0] == 2:
-        #     p = 0.375
-        # else:
-        #     p = 0.5
-
-        # if tf[1] == 0:
-        #     q = 0.2
-        # elif tf[1] == 1:
-        #     q = 0.4
-        # elif tf[1] == 2:
-        #     q = 0.6
-        # else:
-        #     q = 0.8
-        if y <= 600:
-            self.tf[0] = 0
-            # if np.random.uniform(0,1) < 0.125 * 0.2 * 0.5:
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-        elif y <= 1200:
-            self.tf[0] = 1
-            if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-        elif y <= 1800:
-            self.tf[0] = 2
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-        elif y <= 2400:
-            self.tf[0] = 3
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.4 :
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')     
-        elif y <= 3000:
-            self.tf[0] = 2
-            if np.random.uniform(0,1) < 0.5 * 0.3 :
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.3 :
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.2 :
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.2 :
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE') 
+        if tf[0] == 0:
+            p = 0.125
+        elif tf[0] == 1:
+            p = 0.25
+        elif tf[0] == 2:
+            p = 0.375
         else:
-            self.tf[0] = 1
-            if np.random.uniform(0,1) < 0.5 * 0.2:
+            p = 0.5
+
+        if tf[1] == 0:
+            q = 0.2
+        elif tf[1] == 1:
+            q = 0.4
+        elif tf[1] == 2:
+            q = 0.6
+        else:
+            q = 0.8
+
+        if np.random.uniform(0,1) < p*q*0.5:
+            if np.random.uniform(0,1) > 0.1 * int(tf[2]):
                 traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.2:
+            else:
+                traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+        if np.random.uniform(0,1) < p*q*0.5:
+            if np.random.uniform(0,1) > 0.1 * int(tf[2]):
                 traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.3:
+            else:
+                traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+        if np.random.uniform(0,1) < (p-p*q)*0.5:
+            if np.random.uniform(0,1) > 0.1 * int(tf[2]):
                 traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')    
+            else:
+                traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+        if np.random.uniform(0,1) < (p-p*q)*0.5:
+            if np.random.uniform(0,1)  > 0.1 * int(tf[2]):
+                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+            else:
+                traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
 
     def get_state(self):
         r_c = traci.edge.getLastStepVehicleNumber("r_c")
@@ -330,7 +438,7 @@ class SumoEnv2(gym.Env):
             phase = [0,0,1,0]
         else:
             phase = [0,0,0,1]
-        if len(self.feature[0]) >= 40:
+        if len(self.feature[0]) >= 60:
             f = [[],[],[],[]]
             f__l = [[],[],[],[]]
             f_t = 0
@@ -350,9 +458,9 @@ class SumoEnv2(gym.Env):
                 f_b_l += self.feature[5][-i] 
                 f_r_l += self.feature[6][-i] 
                 f_l_l += self.feature[7][-i] 
-        else:
-            state = [r_c,l_c,t_c,b_c,r_c_l,l_c_l,t_c_l,b_c_l,phase[0],phase[1],phase[2],phase[3],0,0,0,0,0,0,0,0]
-            return np.array(state, dtype="float32")
+        # else:
+        #     state = [r_c,l_c,t_c,b_c,r_c_l,l_c_l,t_c_l,b_c_l,phase[0],phase[1],phase[2],phase[3],0,0,0,0,0,0,0,0]
+        #     return np.array(state, dtype="float32")
         f[0] = f_t
         f[1] = f_b
         f[2] = f_r
@@ -361,6 +469,67 @@ class SumoEnv2(gym.Env):
         f__l[1] = f_b_l
         f__l[2] = f_r_l
         f__l[3] = f_l_l
+
+
+        t_10 = 0
+        t_20 = 0
+        t_30 = 0
+        t_40 = 0
+        t_50 = 0
+        t_60 = 0
+        t_70 = 0
+        t_80 = 0
+        t_90 = 0
+        t_100 = 0
+        t_r_60 = 0
+        for i in range(10):
+            # print(self.feature[0][-i])
+            t_10 += self.feature[0][-i] 
+        for i in range(20):
+            # print(self.feature[0][-i])
+            t_20 += self.feature[0][-i] 
+        for i in range(30):
+            # print(self.feature[0][-i])
+            t_30 += self.feature[0][-i] 
+        for i in range(40):
+            # print(self.feature[0][-i])
+            t_40 += self.feature[0][-i] 
+        for i in range(50):
+            # print(self.feature[0][-i])
+            t_50 += self.feature[0][-i] 
+        for i in range(60):
+            # print(self.feature[0][-i])
+            t_60 += self.feature[0][-i] 
+        for i in range(70):
+            # print(self.feature[0][-i])
+            t_70 += self.feature[0][-i] 
+        for i in range(80):
+            # print(self.feature[0][-i])
+            t_80 += self.feature[0][-i] 
+        for i in range(90):
+            # print(self.feature[0][-i])
+            t_90 += self.feature[0][-i] 
+        for i in range(100):
+            # print(self.feature[0][-i])
+            t_100 += self.feature[0][-i] 
+
+        for i in range(60):
+            # print(self.feature[0][-i])
+            t_r_60 += self.feature[4][-i] 
+        # print(f_t)
+        self.a.append(t_10)
+        self.b.append(t_20)
+        self.c.append(t_30)
+        self.d.append(t_40)
+        self.e.append(t_50)
+        self.f.append(t_60)
+        self.g.append(t_70)
+        self.h.append(t_80)
+        self.i.append(t_90)
+        self.j.append(t_100)
+
+        self.k.append(t_r_60)
+        
         # for i in range(4):
         #     if f[i] <= 10:
         #         f[i] = 0
