@@ -1,0 +1,1206 @@
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   ../Vol1/MyEnv/__pycache__/__init__.cpython-38.pyc
+	modified:   ../Vol1/MyEnv/__pycache__/testenv.cpython-38.pyc
+	modified:   ../Vol1/MyEnv/env.py
+	modified:   ../Vol1/MyEnv/testenv.py
+	modified:   ../Vol1/MyEnv2/__pycache__/env.cpython-38.pyc
+	modified:   ../Vol1/MyEnv2/__pycache__/testenv.cpython-38.pyc
+	modified:   ../Vol1/MyEnv2/env.py
+	modified:   ../Vol1/MyEnv2/testenv.py
+	deleted:    ../Vol1/network/poo1/model.npz
+	deleted:    ../Vol1/network/poo1/obs_normalizer.npz
+	deleted:    ../Vol1/network/poo1/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T182845.161861/1600_except/model.npz
+	deleted:    ../Vol1/results2/20210119T182845.161861/1600_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T182845.161861/1600_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T182845.161861/args.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/command.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/environ.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/git-head.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/git-log.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/git-status.txt
+	deleted:    ../Vol1/results2/20210119T182845.161861/scores.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/674_except/model.npz
+	deleted:    ../Vol1/results2/20210119T193249.447533/674_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193249.447533/674_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193249.447533/args.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/command.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/environ.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193249.447533/scores.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/275_except/model.npz
+	deleted:    ../Vol1/results2/20210119T193304.486251/275_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193304.486251/275_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193304.486251/args.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/command.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/environ.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193304.486251/scores.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/186_except/model.npz
+	deleted:    ../Vol1/results2/20210119T193313.876022/186_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193313.876022/186_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193313.876022/args.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/command.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/environ.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193313.876022/scores.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/960_except/model.npz
+	deleted:    ../Vol1/results2/20210119T193321.825941/960_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193321.825941/960_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193321.825941/args.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/command.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/environ.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193321.825941/scores.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/173_except/model.npz
+	deleted:    ../Vol1/results2/20210119T193338.626800/173_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193338.626800/173_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193338.626800/args.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/command.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/environ.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193338.626800/scores.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/2443_except/model.npz
+	deleted:    ../Vol1/results2/20210119T193345.489614/2443_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193345.489614/2443_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193345.489614/args.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/command.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/environ.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193345.489614/scores.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/360000_finish/model.npz
+	deleted:    ../Vol1/results2/20210119T193420.715732/360000_finish/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193420.715732/360000_finish/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193420.715732/args.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/best/model.npz
+	deleted:    ../Vol1/results2/20210119T193420.715732/best/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210119T193420.715732/best/optimizer.npz
+	deleted:    ../Vol1/results2/20210119T193420.715732/command.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/environ.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/git-diff.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/git-head.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/git-log.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/git-status.txt
+	deleted:    ../Vol1/results2/20210119T193420.715732/scores.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/args.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/command.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/environ.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/git-head.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/git-log.txt
+	deleted:    ../Vol1/results2/20210120T135829.789645/git-status.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/args.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/command.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/environ.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/git-head.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/git-log.txt
+	deleted:    ../Vol1/results2/20210120T140908.696028/git-status.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/args.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/command.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/environ.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/git-head.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/git-log.txt
+	deleted:    ../Vol1/results2/20210120T140952.615969/git-status.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/args.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/command.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/environ.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/git-head.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/git-log.txt
+	deleted:    ../Vol1/results2/20210120T141323.145197/git-status.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/args.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/command.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/environ.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/git-head.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/git-log.txt
+	deleted:    ../Vol1/results2/20210120T141832.705378/git-status.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/args.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/command.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/environ.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/git-head.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/git-log.txt
+	deleted:    ../Vol1/results2/20210120T142424.134261/git-status.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/args.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/command.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/environ.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/git-head.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/git-log.txt
+	deleted:    ../Vol1/results2/20210120T142454.395500/git-status.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/args.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/command.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/environ.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/git-head.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/git-log.txt
+	deleted:    ../Vol1/results2/20210120T152922.383581/git-status.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/args.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/command.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/environ.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/git-head.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/git-log.txt
+	deleted:    ../Vol1/results2/20210120T152941.195002/git-status.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/args.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/command.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/environ.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/git-head.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/git-log.txt
+	deleted:    ../Vol1/results2/20210120T153015.509768/git-status.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/args.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/command.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/environ.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/git-diff.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/git-head.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/git-log.txt
+	deleted:    ../Vol1/results2/20210120T155413.710341/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/args.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/command.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/environ.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/git-head.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/git-log.txt
+	deleted:    ../Vol1/results2/20210127T173302.102770/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/0_except/model.npz
+	deleted:    ../Vol1/results2/20210127T173347.058863/0_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T173347.058863/0_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T173347.058863/args.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/command.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/environ.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/git-head.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/git-log.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173347.058863/scores.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/220_except/model.npz
+	deleted:    ../Vol1/results2/20210127T173414.949979/220_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T173414.949979/220_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T173414.949979/args.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/command.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/environ.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/git-head.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/git-log.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173414.949979/scores.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/99_except/model.npz
+	deleted:    ../Vol1/results2/20210127T173532.405204/99_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T173532.405204/99_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T173532.405204/args.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/command.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/environ.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/git-head.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/git-log.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173532.405204/scores.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/0_except/model.npz
+	deleted:    ../Vol1/results2/20210127T173710.994307/0_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T173710.994307/0_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T173710.994307/args.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/command.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/environ.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/git-head.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/git-log.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173710.994307/scores.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/12_except/model.npz
+	deleted:    ../Vol1/results2/20210127T173721.562522/12_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T173721.562522/12_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T173721.562522/args.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/command.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/environ.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/git-head.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/git-log.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/git-status.txt
+	deleted:    ../Vol1/results2/20210127T173721.562522/scores.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/args.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/command.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/environ.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/git-head.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/git-log.txt
+	deleted:    ../Vol1/results2/20210127T175413.370175/git-status.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/args.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/command.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/environ.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/git-head.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/git-log.txt
+	deleted:    ../Vol1/results2/20210127T175432.430724/git-status.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/0_except/model.npz
+	deleted:    ../Vol1/results2/20210127T175452.684551/0_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T175452.684551/0_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T175452.684551/args.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/command.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/environ.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/git-head.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/git-log.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/git-status.txt
+	deleted:    ../Vol1/results2/20210127T175452.684551/scores.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/127_except/model.npz
+	deleted:    ../Vol1/results2/20210127T175527.161968/127_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T175527.161968/127_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T175527.161968/args.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/command.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/environ.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/git-head.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/git-log.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/git-status.txt
+	deleted:    ../Vol1/results2/20210127T175527.161968/scores.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/96_except/model.npz
+	deleted:    ../Vol1/results2/20210127T175548.432902/96_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T175548.432902/96_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T175548.432902/args.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/command.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/environ.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/git-head.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/git-log.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/git-status.txt
+	deleted:    ../Vol1/results2/20210127T175548.432902/scores.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/69_except/model.npz
+	deleted:    ../Vol1/results2/20210127T175655.806602/69_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T175655.806602/69_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T175655.806602/args.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/command.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/environ.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/git-head.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/git-log.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/git-status.txt
+	deleted:    ../Vol1/results2/20210127T175655.806602/scores.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/44_except/model.npz
+	deleted:    ../Vol1/results2/20210127T180211.893235/44_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T180211.893235/44_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T180211.893235/args.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/command.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/environ.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/git-head.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/git-log.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/git-status.txt
+	deleted:    ../Vol1/results2/20210127T180211.893235/scores.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/0_except/model.npz
+	deleted:    ../Vol1/results2/20210127T180430.241478/0_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T180430.241478/0_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T180430.241478/args.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/command.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/environ.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/git-head.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/git-log.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/git-status.txt
+	deleted:    ../Vol1/results2/20210127T180430.241478/scores.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/0_except/model.npz
+	deleted:    ../Vol1/results2/20210127T180456.319240/0_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T180456.319240/0_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T180456.319240/args.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/command.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/environ.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/git-head.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/git-log.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/git-status.txt
+	deleted:    ../Vol1/results2/20210127T180456.319240/scores.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/67_except/model.npz
+	deleted:    ../Vol1/results2/20210127T181148.418012/67_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T181148.418012/67_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T181148.418012/args.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/command.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/environ.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/git-head.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/git-log.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/git-status.txt
+	deleted:    ../Vol1/results2/20210127T181148.418012/scores.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/174_except/model.npz
+	deleted:    ../Vol1/results2/20210127T181254.185528/174_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T181254.185528/174_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T181254.185528/args.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/command.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/environ.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/git-head.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/git-log.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/git-status.txt
+	deleted:    ../Vol1/results2/20210127T181254.185528/scores.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/18_except/model.npz
+	deleted:    ../Vol1/results2/20210127T181406.803827/18_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T181406.803827/18_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T181406.803827/args.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/command.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/environ.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/git-head.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/git-log.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/git-status.txt
+	deleted:    ../Vol1/results2/20210127T181406.803827/scores.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/301_except/model.npz
+	deleted:    ../Vol1/results2/20210127T181639.782119/301_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T181639.782119/301_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T181639.782119/args.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/command.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/environ.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/git-head.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/git-log.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/git-status.txt
+	deleted:    ../Vol1/results2/20210127T181639.782119/scores.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/68_except/model.npz
+	deleted:    ../Vol1/results2/20210127T181744.223266/68_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T181744.223266/68_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T181744.223266/args.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/command.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/environ.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/git-head.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/git-log.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/git-status.txt
+	deleted:    ../Vol1/results2/20210127T181744.223266/scores.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/args.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/command.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/environ.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/git-head.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/git-log.txt
+	deleted:    ../Vol1/results2/20210127T200835.064053/git-status.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/args.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/command.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/environ.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/git-head.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/git-log.txt
+	deleted:    ../Vol1/results2/20210127T201124.887414/git-status.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/args.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/command.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/environ.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/git-head.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/git-log.txt
+	deleted:    ../Vol1/results2/20210127T201424.012153/git-status.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/args.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/command.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/environ.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/git-head.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/git-log.txt
+	deleted:    ../Vol1/results2/20210127T201603.045567/git-status.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T201631.583492/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T201631.583492/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T201631.583492/args.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/command.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/environ.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/git-head.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/git-log.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/git-status.txt
+	deleted:    ../Vol1/results2/20210127T201631.583492/scores.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T201722.811389/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T201722.811389/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T201722.811389/args.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/command.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/environ.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/git-head.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/git-log.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/git-status.txt
+	deleted:    ../Vol1/results2/20210127T201722.811389/scores.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T202045.818701/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T202045.818701/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T202045.818701/args.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/command.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/environ.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/git-head.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/git-log.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/git-status.txt
+	deleted:    ../Vol1/results2/20210127T202045.818701/scores.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T202244.466599/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T202244.466599/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T202244.466599/args.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/command.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/environ.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/git-head.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/git-log.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/git-status.txt
+	deleted:    ../Vol1/results2/20210127T202244.466599/scores.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T202504.124891/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T202504.124891/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T202504.124891/args.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/command.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/environ.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/git-head.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/git-log.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/git-status.txt
+	deleted:    ../Vol1/results2/20210127T202504.124891/scores.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T202530.540819/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T202530.540819/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T202530.540819/args.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/command.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/environ.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/git-head.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/git-log.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/git-status.txt
+	deleted:    ../Vol1/results2/20210127T202530.540819/scores.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T202618.509669/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T202618.509669/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T202618.509669/args.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/command.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/environ.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/git-head.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/git-log.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/git-status.txt
+	deleted:    ../Vol1/results2/20210127T202618.509669/scores.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T203100.788098/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203100.788098/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203100.788098/args.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/command.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/environ.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203100.788098/scores.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T203259.230945/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203259.230945/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203259.230945/args.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/command.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/environ.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203259.230945/scores.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T203339.167679/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203339.167679/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203339.167679/args.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/command.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/environ.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203339.167679/scores.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/50_except/model.npz
+	deleted:    ../Vol1/results2/20210127T203441.842696/50_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203441.842696/50_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203441.842696/args.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/command.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/environ.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203441.842696/scores.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/1686_except/model.npz
+	deleted:    ../Vol1/results2/20210127T203459.068449/1686_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203459.068449/1686_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203459.068449/args.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/command.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/environ.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203459.068449/scores.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/2171_except/model.npz
+	deleted:    ../Vol1/results2/20210127T203532.692730/2171_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203532.692730/2171_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203532.692730/args.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/command.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/environ.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203532.692730/scores.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/180000_finish/model.npz
+	deleted:    ../Vol1/results2/20210127T203716.008019/180000_finish/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203716.008019/180000_finish/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203716.008019/args.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/best/model.npz
+	deleted:    ../Vol1/results2/20210127T203716.008019/best/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T203716.008019/best/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T203716.008019/command.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/environ.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/git-head.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/git-log.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/git-status.txt
+	deleted:    ../Vol1/results2/20210127T203716.008019/scores.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/args.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/command.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/environ.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212252.028889/git-status.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/args.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/command.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/environ.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212307.695496/git-status.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/args.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/command.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/environ.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212542.506357/git-status.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/args.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/command.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/environ.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212631.105553/git-status.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/args.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/command.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/environ.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212900.941852/git-status.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/args.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/command.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/environ.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212918.972726/git-status.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/args.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/command.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/environ.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/git-head.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/git-log.txt
+	deleted:    ../Vol1/results2/20210127T212957.138084/git-status.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/664_except/model.npz
+	deleted:    ../Vol1/results2/20210127T222624.458287/664_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T222624.458287/664_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T222624.458287/args.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/command.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/environ.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/git-head.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/git-log.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/git-status.txt
+	deleted:    ../Vol1/results2/20210127T222624.458287/scores.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/1336_except/model.npz
+	deleted:    ../Vol1/results2/20210127T222748.639782/1336_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T222748.639782/1336_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T222748.639782/args.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/command.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/environ.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/git-head.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/git-log.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/git-status.txt
+	deleted:    ../Vol1/results2/20210127T222748.639782/scores.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/702_except/model.npz
+	deleted:    ../Vol1/results2/20210127T222902.812413/702_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T222902.812413/702_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T222902.812413/args.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/command.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/environ.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/git-head.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/git-log.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/git-status.txt
+	deleted:    ../Vol1/results2/20210127T222902.812413/scores.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/2775_except/model.npz
+	deleted:    ../Vol1/results2/20210127T222935.197374/2775_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T222935.197374/2775_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T222935.197374/args.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/command.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/environ.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/git-head.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/git-log.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/git-status.txt
+	deleted:    ../Vol1/results2/20210127T222935.197374/scores.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/36000_finish/model.npz
+	deleted:    ../Vol1/results2/20210127T223106.129588/36000_finish/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T223106.129588/36000_finish/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T223106.129588/args.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/command.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/environ.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/git-head.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/git-log.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/git-status.txt
+	deleted:    ../Vol1/results2/20210127T223106.129588/scores.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/args.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/command.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/environ.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/git-head.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/git-log.txt
+	deleted:    ../Vol1/results2/20210127T224309.605895/git-status.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/args.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/command.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/environ.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/git-head.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/git-log.txt
+	deleted:    ../Vol1/results2/20210127T225642.715435/git-status.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/360000_finish/model.npz
+	deleted:    ../Vol1/results2/20210127T230043.811033/360000_finish/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T230043.811033/360000_finish/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T230043.811033/args.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/best/model.npz
+	deleted:    ../Vol1/results2/20210127T230043.811033/best/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210127T230043.811033/best/optimizer.npz
+	deleted:    ../Vol1/results2/20210127T230043.811033/command.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/environ.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/git-diff.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/git-head.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/git-log.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/git-status.txt
+	deleted:    ../Vol1/results2/20210127T230043.811033/scores.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/args.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/command.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/environ.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/git-head.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/git-log.txt
+	deleted:    ../Vol1/results2/20210128T003525.118661/git-status.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/args.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/command.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/environ.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/git-head.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/git-log.txt
+	deleted:    ../Vol1/results2/20210128T005111.014086/git-status.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/args.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/command.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/environ.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/git-head.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/git-log.txt
+	deleted:    ../Vol1/results2/20210128T005810.681124/git-status.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/args.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/command.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/environ.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/git-head.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/git-log.txt
+	deleted:    ../Vol1/results2/20210128T010003.778985/git-status.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/args.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/command.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/environ.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/git-head.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/git-log.txt
+	deleted:    ../Vol1/results2/20210128T011728.957221/git-status.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/args.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/command.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/environ.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/git-head.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/git-log.txt
+	deleted:    ../Vol1/results2/20210128T012633.657251/git-status.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/args.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/command.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/environ.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/git-head.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/git-log.txt
+	deleted:    ../Vol1/results2/20210128T124118.198286/git-status.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/args.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/command.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/environ.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/git-head.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/git-log.txt
+	deleted:    ../Vol1/results2/20210128T144921.270070/git-status.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/args.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/command.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/environ.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/git-head.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/git-log.txt
+	deleted:    ../Vol1/results2/20210128T145137.316084/git-status.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/args.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/command.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/environ.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/git-head.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/git-log.txt
+	deleted:    ../Vol1/results2/20210128T145148.972201/git-status.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/args.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/command.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/environ.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/git-head.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/git-log.txt
+	deleted:    ../Vol1/results2/20210128T145316.921516/git-status.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/args.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/command.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/environ.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/git-head.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/git-log.txt
+	deleted:    ../Vol1/results2/20210128T145837.529759/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/args.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/command.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/environ.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150013.813355/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/args.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/command.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/environ.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150059.232362/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/args.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/command.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/environ.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150144.566028/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/args.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/command.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/environ.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150246.551936/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/args.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/command.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/environ.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150355.199805/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/args.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/command.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/environ.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150704.052267/git-status.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/args.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/command.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/environ.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/git-head.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/git-log.txt
+	deleted:    ../Vol1/results2/20210128T150811.438900/git-status.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/args.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/command.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/environ.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/git-head.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/git-log.txt
+	deleted:    ../Vol1/results2/20210128T151030.575567/git-status.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/args.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/command.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/environ.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/git-diff.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/git-head.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/git-log.txt
+	deleted:    ../Vol1/results2/20210128T151149.829333/git-status.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/args.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/command.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/environ.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/git-head.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/git-log.txt
+	deleted:    ../Vol1/results2/20210129T003809.889566/git-status.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/args.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/command.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/environ.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/git-head.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/git-log.txt
+	deleted:    ../Vol1/results2/20210129T004053.813362/git-status.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/args.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/command.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/environ.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/git-head.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/git-log.txt
+	deleted:    ../Vol1/results2/20210129T004103.871489/git-status.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/args.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/command.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/environ.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/git-head.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/git-log.txt
+	deleted:    ../Vol1/results2/20210129T004256.091795/git-status.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/args.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/command.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/environ.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/git-head.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/git-log.txt
+	deleted:    ../Vol1/results2/20210129T004447.264086/git-status.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/args.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/command.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/environ.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/git-head.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/git-log.txt
+	deleted:    ../Vol1/results2/20210129T010813.316212/git-status.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/args.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/command.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/environ.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/git-head.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/git-log.txt
+	deleted:    ../Vol1/results2/20210129T010914.898448/git-status.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/args.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/command.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/environ.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/git-head.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/git-log.txt
+	deleted:    ../Vol1/results2/20210129T013154.482250/git-status.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/args.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/command.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/environ.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/git-head.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/git-log.txt
+	deleted:    ../Vol1/results2/20210129T013400.972471/git-status.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/args.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/command.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/environ.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/git-head.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/git-log.txt
+	deleted:    ../Vol1/results2/20210129T014246.486051/git-status.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/args.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/command.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/environ.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/git-head.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/git-log.txt
+	deleted:    ../Vol1/results2/20210129T014258.703737/git-status.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/args.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/command.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/environ.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/git-diff.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/git-head.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/git-log.txt
+	deleted:    ../Vol1/results2/20210129T014925.195511/git-status.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/129_except/model.npz
+	deleted:    ../Vol1/results2/20210207T223411.269820/129_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210207T223411.269820/129_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210207T223411.269820/args.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/command.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/environ.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/git-diff.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/git-head.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/git-log.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/git-status.txt
+	deleted:    ../Vol1/results2/20210207T223411.269820/scores.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/1070_except/model.npz
+	deleted:    ../Vol1/results2/20210207T223536.691110/1070_except/obs_normalizer.npz
+	deleted:    ../Vol1/results2/20210207T223536.691110/1070_except/optimizer.npz
+	deleted:    ../Vol1/results2/20210207T223536.691110/args.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/command.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/environ.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/git-diff.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/git-head.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/git-log.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/git-status.txt
+	deleted:    ../Vol1/results2/20210207T223536.691110/scores.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/args.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/command.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/environ.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/git-diff.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/git-head.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/git-log.txt
+	deleted:    ../Vol1/results2/20210208T064449.158245/git-status.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/args.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/command.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/environ.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/git-diff.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/git-head.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/git-log.txt
+	deleted:    ../Vol1/results2/20210208T064521.467250/git-status.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/args.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/command.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/environ.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/git-diff.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/git-head.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/git-log.txt
+	deleted:    ../Vol1/results2/20210208T064709.832140/git-status.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/args.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/command.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/environ.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/git-head.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/git-log.txt
+	deleted:    ../Vol1/results2/20210227T112018.748683/git-status.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/args.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/command.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/environ.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/git-head.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/git-log.txt
+	deleted:    ../Vol1/results2/20210227T182708.898055/git-status.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/args.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/command.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/environ.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/git-head.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/git-log.txt
+	deleted:    ../Vol1/results2/20210227T182751.428993/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/args.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/command.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/environ.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183135.514087/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/args.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/command.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/environ.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183328.646313/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/args.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/command.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/environ.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183403.889028/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/args.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/command.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/environ.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183533.718090/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/args.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/command.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/environ.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183557.387053/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/args.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/command.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/environ.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183651.701135/git-status.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/args.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/command.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/environ.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/git-diff.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/git-head.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/git-log.txt
+	deleted:    ../Vol1/results2/20210227T183803.293177/git-status.txt
+	modified:   MyEnv_feature/__pycache__/env.cpython-38.pyc
+	modified:   MyEnv_feature/__pycache__/testenv.cpython-38.pyc
+	modified:   MyEnv_feature/env.py
+	modified:   MyEnv_feature/testenv.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../../../iee/GeneraLight/
+	../../../iee/double_transaction/double/
+	../../../iee/image/
+	../../../iee/kalman/
+	../../../iee/maml/
+	../../../iee/scramble/
+	../../../iee/single_transaction/choice_split/
+	../../../iee/switch/
+	../../../iee/timeseries/
+	../Vol1/network/hikaku/
+	../Vol1/network/vol1/
+	../Vol1/results/20210228T152159.046284/
+	../Vol1/results/20210228T152425.667976/
+	../Vol1/results/20210228T152507.906037/
+	../Vol1/results/20210228T152532.595640/
+	../Vol1/results/20210228T152713.480431/
+	../Vol1/results/20210228T152959.165922/
+	../Vol1/results/20210228T153006.202434/
+	../Vol1/results/20210228T153128.836878/
+	../Vol1/results/20210228T153143.319374/
+	../Vol1/results/20210228T153208.511939/
+	../Vol1/results/20210228T153230.368576/
+	../Vol1/results/20210228T154321.019730/
+	../Vol1/results/20210228T154414.179066/
+	../Vol1/results/20210228T154434.321817/
+	../Vol1/results/20210228T154518.622216/
+	../Vol1/results/20210228T154638.787114/
+	../Vol1/results/20210228T154651.330867/
+	../Vol1/results/20210228T154657.831761/
+	../Vol1/results/20210228T154739.764260/
+	../Vol1/results/20210228T154800.535036/
+	../Vol1/results/20210228T155117.541107/
+	../Vol1/results/20210228T155519.715162/
+	../Vol1/results/20210228T155732.170048/
+	../Vol1/results/20210228T155756.445583/
+	../Vol1/results/20210228T155824.747585/
+	../Vol1/results/20210228T155900.579139/
+	../Vol1/results/20210228T155927.527774/
+	../Vol1/results/20210228T162542.008962/
+	../Vol1/results/20210228T162556.145894/
+	../Vol1/results/20210228T162649.747404/
+	../Vol1/results/20210228T162701.020425/
+	../Vol1/results/20210228T163132.378774/
+	../Vol1/results/20210228T163205.391199/
+	../Vol1/results/20210228T163405.441922/
+	../Vol1/results/20210228T163430.704506/
+	../Vol1/results/20210228T163548.445973/
+	../Vol1/results/20210228T163652.393842/
+	../Vol1/results/20210228T182619.626858/
+	../Vol1/results/20210228T183258.990308/
+	../Vol1/results/20210301T112608.830923/
+	../Vol1/results/20210301T112713.332062/
+	../Vol1/results2/20210227T215032.767890/
+	../Vol1/results2/20210227T215128.955764/
+	../Vol1/results2/20210227T215924.954548/
+	../Vol1/results2/20210227T220221.797387/
+	../Vol1/results2/20210227T220239.829393/
+	../Vol1/results2/20210227T220302.032728/
+	../Vol1/results2/20210227T220326.606642/
+	../Vol1/results2/20210227T220435.652932/
+	../Vol1/results2/20210227T220734.209694/
+	../Vol1/results2/20210227T220810.313852/
+	../Vol1/results2/20210227T220930.865358/
+	../Vol1/results2/20210227T221314.866595/
+	../Vol1/results2/20210227T221812.531905/
+	../Vol1/results2/20210227T222002.629723/
+	../Vol1/results2/20210227T222031.708321/
+	../Vol1/results2/20210227T222224.760049/
+	../Vol1/results2/20210227T222243.738834/
+	../Vol1/results2/20210227T222355.461519/
+	../Vol1/results2/20210227T222431.664378/
+	../Vol1/results2/20210227T222529.056426/
+	../Vol1/results2/20210227T222719.617860/
+	../Vol1/results2/20210227T223430.090265/
+	../Vol1/results2/20210227T223439.313955/
+	../Vol1/results2/20210227T223448.107363/
+	../Vol1/results2/20210227T223506.509876/
+	../Vol1/results2/20210227T223625.130649/
+	../Vol1/results2/20210227T223638.594606/
+	../Vol1/results2/20210228T001228.775830/
+	../Vol1/results2/20210228T001255.445617/
+	../Vol1/results2/20210228T001310.020941/
+	../Vol1/results2/20210228T001611.276752/
+	../Vol1/results2/20210228T015015.139789/
+	../Vol1/results2/20210228T111715.219198/
+	../Vol1/results2/20210228T111722.207142/
+	../Vol1/results2/20210228T152043.833529/
+	../Vol1/results2/20210228T152952.911267/
+	../Vol1/results2/20210228T155155.953943/
+	../Vol1/results2/20210228T160149.970057/
+	../Vol1/results2/20210228T160632.746745/
+	../Vol1/results2/20210228T160753.394203/
+	../Vol1/results2/20210228T161128.873796/
+	../Vol1/results2/20210228T161342.715385/
+	../Vol1/results2/20210228T161604.117585/
+	../Vol1/results2/20210228T164253.627127/
+	../Vol1/results2/20210228T182147.789156/
+	../Vol1/results2/20210228T183314.579761/
+	../Vol1/results2/20210228T201415.601571/
+	../Vol1/results2/20210228T201844.883573/
+	../Vol1/results2/20210228T201855.466009/
+	../Vol1/results2/20210228T214616.643324/
+	../Vol1/results2/20210228T214857.842892/
+	../Vol1/results2/20210228T215042.141705/
+	../Vol1/results2/20210228T215157.994961/
+	../Vol1/results2/20210228T215225.218105/
+	../Vol1/results2/20210228T215336.272411/
+	../Vol1/results2/20210228T215408.967486/
+	../Vol1/results2/20210228T215557.339950/
+	../Vol1/results2/20210228T220046.864917/
+	../Vol1/results2/20210228T220205.831145/
+	../Vol1/results2/20210228T220235.278236/
+	../Vol1/results2/20210228T220322.383331/
+	../Vol1/results2/20210228T220600.184590/
+	../Vol1/results2/20210228T221155.378979/
+	../Vol1/results2/20210228T221657.113792/
+	../Vol1/results2/20210228T222305.603741/
+	../Vol1/results2/20210228T224323.707250/
+	../Vol1/results2/20210301T001434.169269/
+	../Vol1/results2/20210301T001446.087088/
+	../Vol1/results2/20210301T002208.289793/
+	../Vol1/results2/20210301T002344.418140/
+	../Vol1/results2/20210301T002444.749923/
+	../Vol1/results2/20210301T002623.421201/
+	../Vol1/results2/20210301T002750.925541/
+	../Vol1/results2/20210301T003152.919200/
+	../Vol1/results2/20210301T003518.900680/
+	../Vol1/results2/20210301T003533.171396/
+	../Vol1/results2/20210301T003649.315103/
+	../Vol1/results2/20210301T004516.197334/
+	../Vol1/results2/20210301T004521.180605/
+	../Vol1/results2/20210301T073518.139981/
+	results/20210226T160508.602926/
+	results/20210226T160952.476546/
+	results/20210228T223425.748529/
+	results/20210228T223447.270919/
+	results/20210228T223600.293373/
+	results/20210228T223659.484691/
+	results/20210228T223804.418125/
+	results/20210301T113620.005288/
+	results/20210301T114052.565316/
+	results/20210301T114319.462708/
+	results2/
+
+no changes added to commit (use "git add" and/or "git commit -a")

@@ -32,7 +32,6 @@ class SumoEnv2(gym.Env):
         self.time = 0
         self.tf = [0,0,0]
         self.travel_time = []
-        self.cycle = 0
         self.episode = 0
        #self.lane_dict = {"gneE1_0": [0, 0, 0, 0, 1], "gne"}
 
@@ -50,37 +49,17 @@ class SumoEnv2(gym.Env):
         self.car_id = defaultdict(list)
         self.idlist = {}
         self.idlist = defaultdict(list)
-        x = 10000
-        s = 0
+        self.time = 0
+        self.tf = [0,0,0]
+        self.cycle = 0
         for i in range(1000):
             traci.simulationStep()
-            if i % 10 == 0:
-                self.get_feature()
-            x = str(x)
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                
-                if np.random.uniform(0,1) > 0.1:
-                    traci.vehicle.addFull(vehID= x + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-                else:
-                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                if np.random.uniform(0,1) > 0.1 :
-                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-                else:
-                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                if np.random.uniform(0,1) > 0.1:
-                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-                else:
-                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                s += 1
-                if np.random.uniform(0,1)  > 0.1 :
-                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-                else:
-                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
-            x = int(x)
-            x += 1
+            self.add_car(self.tf,self.time)
+            # if i % 10 == 0:
+                # self.get_feature()
+            if i % 200 == 0:
+                self.tf = self.choice_trafficflow()
+            self.time += 1
         return self.get_state()
 
     # def step(self, action):
@@ -107,6 +86,7 @@ class SumoEnv2(gym.Env):
 
     def state_trans(self,a):
         phase = traci.trafficlight.getPhase("c")
+        id = traci.vehicle.getIDList()
         # print(a)
         if a == 0:
             if phase == 0 or phase == 2:
@@ -163,15 +143,19 @@ class SumoEnv2(gym.Env):
 
     def choice_trafficflow(self):
         a = random.randint(0,3)
-        b = random.randint(0,3)
+        if a >= 2:
+            b = random.randint(1,2)
+        else:
+            b = random.randint(0,3)
         c = random.randint(1,3)
         tf = [a,b,c]
         return tf
 
+
     def count_traveltime(self,id,cycle):
         for i in id:
-            if i not in self.car_id :
-                self.car_id[i] =[1]
+            if i not in self.car_id or self.car_id[i][1] != cycle:
+                self.car_id[i] =[0, cycle]
             else:
                 self.car_id[i][0] += 1
 
@@ -188,7 +172,7 @@ class SumoEnv2(gym.Env):
         next_s = self.get_state()
         reward = self._get_reward(next_s, action)
         t = traci.simulation.getTime()
-
+        if t >= 4600:
             a = 0
             b = 1
             for i in self.car_id:
@@ -198,7 +182,7 @@ class SumoEnv2(gym.Env):
             self.travel_time.append(traveltime)
             self.cycle += 1
             self.done = True
-            if self.episode == 10:
+            if self.episode == 50:
                 mean = statistics.mean(self.travel_time)
                 variance = statistics.variance(self.travel_time)
                 print('平均: {0:.2f}'.format(mean))
@@ -218,13 +202,13 @@ class SumoEnv2(gym.Env):
     def add_car(self,tf,step):
         x = str(step)
         if tf[0] == 0:
-            p = 0.25
+            p = 0.125
         elif tf[0] == 1:
-            p = 0.50
+            p = 0.25
         elif tf[0] == 2:
-            p = 0.75
+            p = 0.375
         else:
-            p = 1
+            p = 0.5
 
         if tf[1] == 0:
             q = 0.2
@@ -280,6 +264,7 @@ class SumoEnv2(gym.Env):
         else:
             phase = [0,0,0,1]
         state = [r_c,l_c,t_c,b_c,r_c_l,l_c_l,t_c_l,b_c_l,phase[0],phase[1],phase[2],phase[3]]
+        # print(state)
         return np.array(state, dtype="float32")
 
     def _get_reward(self,next_s, action):

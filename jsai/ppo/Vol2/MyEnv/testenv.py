@@ -244,7 +244,7 @@ class SumoEnv2(gym.Env):
             self.cycle += 1
             self.done = True
             self.episode += 1
-            if self.episode == 10:
+            if self.episode == 50:
                 mean = statistics.mean(self.travel_time)
                 variance = statistics.variance(self.travel_time)
                 print('平均: {0:.2f}'.format(mean))

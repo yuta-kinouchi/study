@@ -1,0 +1,1788 @@
+diff --git a/iee/function/single.py b/iee/function/single.py
+index 99e73a7..9242a4f 100644
+--- a/iee/function/single.py
++++ b/iee/function/single.py
+@@ -6,185 +6,352 @@ import matplotlib.pyplot as plt
+ import traci
+ from collections import defaultdict
+ import pickle
++import scipy.linalg as LA
+ 
+-# Qtable = np.zeros((120,50,120,50,8,4))
+-Qtable = np.zeros((150,150,2,2))
+-epsilon = 0.1
+-gamma = 0.9
+-alpha = 0.1
+-xmlfl = "reinforcement.net.xml"
+-car_id = {}
+-car_id_2 = {}
+-car_id = defaultdict(list)
+-car_id_2 = defaultdict(list)
+-
+-np.set_printoptions(threshold=np.inf)
+-
+-def count_traveltime(id,cycle):
+-    for i in id:
+-        if i not in car_id or car_id[i][1] != cycle:
+-            car_id[i] =[0, cycle]
++def rulebase():
++    car_id = {}
++    car_id = defaultdict(list)
++    def count_traveltime(id,cycle):
++        for i in id:
++            # そのIDがリストの中にあるかないかチェック
++            if i not in car_id or car_id[i][1] != cycle:
++                car_id[i] =[0, cycle]
++                
++            else:
++                car_id[i][0] += 1
+             # print(car_id[i])
++            # print(car_id[i][0])
++
++    rewards = []
++    travel_time = []
++    # traci.start(["sumo-gui", "-c", "single.sumocfg"])
++    traci.start(["sumo", "-c", "single.sumocfg"])
++    # traci.simulationStep(1000)
++    cycle = 0
++    j = 0
++    for iter in range(10):
++        for step in range(1000):
++            # r = reward()
++            # rewards.append(r)
++            id = traci.vehicle.getIDList()
++            # check_car()
++            count_traveltime(id,cycle)
++            traci.simulationStep()
++        
++        if j == 0:
++            j += 1
+         else:
+-            car_id[i][0] += 1
+-            # print(car_id[i])
++            a = 0
++            b = 1
++            for i in car_id:
++                if car_id[i][1] == cycle:
++                    a += car_id[i][0]
++                    b += 1
++            traveltime = a / b
++            # print(traveltime)
++            travel_time.append(traveltime)
++            # print(travel_time)
++            cycle += 1
++    traci.close()
++    return travel_time
+ 
+-def count_traveltime_2(id,cycle):
+-    for i in id:
+-        if i not in car_id_2 or car_id_2[i][1] != cycle:
+-            car_id_2[i] =[0, cycle]
+-            # print(car_id[i])
++def reinforcement():
++
++    # Qtable = np.zeros((150,150,2,2))
++    # epsilon = 0.1
++    gamma = 0.9
++    alpha = 0.1
++    xmlfl = "reinforcement.net.xml"
++    car_id = {}
++    car_id = defaultdict(list)
++
++
++    def count_traveltime(id,cycle):
++        for i in id:
++            if i not in car_id or car_id[i][1] != cycle:
++                car_id[i] =[0, cycle]
++                # print(car_id[i])
++            else:
++                car_id[i][0] += 1
++                # print(car_id[i])
++
++    def get_state():
++        cars_r_c = traci.edge.getLastStepVehicleNumber("r_c")
++        cars_l_c = traci.edge.getLastStepVehicleNumber("l_c")
++        cars_t_c = traci.edge.getLastStepVehicleNumber("t_c")
++        cars_b_c = traci.edge.getLastStepVehicleNumber("b_c")
++        tate = (cars_t_c + cars_b_c)
++        yoko = (cars_r_c + cars_l_c)
++        phase = traci.trafficlight.getPhase("c")
++        if phase < 4:
++            phase = 0
+         else:
+-            car_id_2[i][0] += 1
+-            # print(car_id[i])
++            phase = 1
++        state = [tate,yoko,phase]
++        return state
+ 
+-def get_state():
+-    cars_r_c = traci.edge.getLastStepHaltingNumber("r_c")
+-    # cars_rr_r = traci.edge.getLastStepVehicleNumber("rr_r")
+-    # cars_r_c_left = traci.lane.getLastStepVehicleNumber("r_c_2")
+-    # cars_r_c = cars_r_c - cars_r_c_left
++    def state_trans(a):
++        phase = traci.trafficlight.getPhase("c")
++        if a == 0:
++            if phase == 0:
++                traci.trafficlight.setPhase("c",0)
++            else:
++                traci.trafficlight.setPhase("c",3)
++        elif a == 1:
++            if phase == 2:
++                traci.trafficlight.setPhase("c",2)
++            else:
++                traci.trafficlight.setPhase("c",1)
++
++    def reward():
++        t_c = traci.edge.getLastStepHaltingNumber("t_c")
++        r_c = traci.edge.getLastStepHaltingNumber("r_c")
++        l_c = traci.edge.getLastStepHaltingNumber("l_c")
++        b_c = traci.edge.getLastStepHaltingNumber("b_c")
++        r =  -(t_c + r_c + l_c + b_c)/300
++        # r =  -(t_c + r_c + l_c + b_c)
++        return r
++
++    # def get_Qvalue(s,a):
++    #     return Qtable[s[0]][s[1]][s[2]][a]
+     
+-    cars_l_c = traci.edge.getLastStepHaltingNumber("l_c")
+-    # cars_ll_l = traci.edge.getLastStepVehicleNumber("ll_l")
+-    # cars_l_c_left = traci.lane.getLastStepVehicleNumber("l_c_2")
+-    # cars_l_c = cars_l_c - cars_l_c_left
+-
+-    cars_t_c = traci.edge.getLastStepHaltingNumber("t_c")
+-    # cars_tt_t = traci.edge.getLastStepVehicleNumber("tt_t")
+-    # cars_t_c_left = traci.lane.getLastStepVehicleNumber("t_c_2")
+-    # cars_t_c = cars_t_c - cars_t_c_left
+-
+-    cars_b_c = traci.edge.getLastStepHaltingNumber("b_c")
+-    # cars_bb_b = traci.edge.getLastStepVehicleNumber("bb_b")
+-    # cars_b_c_left = traci.lane.getLastStepVehicleNumber("b_c_2")
+-    # cars_b_c = cars_b_c - cars_b_c_left
+-
+-
+-    # yoko = cars_t_c + cars_tt_t + cars_b_c + cars_bb_b
+-    # tate = cars_r_c + cars_rr_r + cars_l_c + cars_ll_l
+-    tate = (cars_t_c + cars_b_c)
+-    yoko = (cars_r_c + cars_l_c)
+-    # tate_left = (cars_r_c_left + cars_l_c_left)
+-    # yoko_left = (cars_t_c_left + cars_b_c_left)
+-    phase = traci.trafficlight.getPhase("c")
+-    if phase < 4:
+-        phase = 0
+-    else:
+-        phase = 1
+-
+-    # state = [tate,tate_left,yoko,yoko_left,phase]
+-    state = [tate,yoko,phase]
+-    return state
+-
+-def select_action(s):
+-    if epsilon < np.random.rand():
+-        # print(s[2])
+-        q = Qtable[s[0]][s[1]][s[2]]
+-        actions = np.where(q == q.max())[0]
+-        return np.random.choice(actions)
+-    else:
+-        return np.random.choice(2)
+-
+-def select_greedy_action(s):
+-    q = Qtable[s[0]][s[1]][s[2]]
+-    actions = np.where(q == q.max())[0]
+-    return np.random.choice(actions)
+-
+-
+-def state_trans(a):
+-    phase = traci.trafficlight.getPhase("c")
+-    # print("action:{0}".format(a))
+-    # print("phase:{0}".format(phase))
+-    if a == 0:
+-        if phase == 0:
+-            traci.trafficlight.setPhase("c",0)
+-            # print("1")
+-        else:
+-            traci.trafficlight.setPhase("c",5)
+-            # print("2")
+-    elif a == 1:
+-        if phase == 4:
+-            traci.trafficlight.setPhase("c",4)
+-            # print("1")
+-        else:
+-            traci.trafficlight.setPhase("c",1)
+-            # print("2")
++    class LinearFunc:
++        N1 = 2
++        N2 = 2
++        N3 = 2
++        # eps = 0.1
++        gamma = 0.9
++        alpha = 0.1
++        var = 0.2
++        ts = 3
++        NUM_ACTION = 2
++        myu_dist_wid = np.linspace(0, N1-1, N1)
++        myu_dist_hei = np.linspace(0, N2-1, N2)
++        myu_dist_hig = np.linspace(0, N3-1, N3)
+ 
++        #　正規化
++        norm_factor = np.array([N1-1, N2-1, N3-1])
++        norm_factor = norm_factor.reshape(len(norm_factor),1)
+ 
++        def __init__(self):
++            self.N1_space = self.myu_dist_wid
++            self.N2_space = self.myu_dist_hei
++            self.N3_space = self.myu_dist_hig
++            
++            b = (self.N1*self.N2*self.N3) # 状態空間を分割した場合の総数 = 基底関数の総数
++                    
++            # 基底関数の定数項を初期化（学習対象外）
++            self.mu_array = np.zeros((self.ts, b)) # 分布の中心値をオール1に初期化
++            
++            cnt =0
++            # このN1、N2の順番に注意
++            for i in self.N3_space:
++                for j in self.N2_space:
++                    for k in self.N1_space:
++                        self.mu_array[0,cnt] = i
++                        self.mu_array[1,cnt] = j
++                        self.mu_array[2,cnt] = k
++                        cnt+=1
++            
++            # エピソード数、はparamsでセット
++            #self.episodes = episodes
++            
++            # 4つのアクションに対して、同じ基底関数セットを用いる
++            self.mu_list = [np.copy(self.mu_array)] * self.NUM_ACTION
++            # print(self.mu_list)
++            
++            # 学習対象のパラメータθの初期化
++            self.omega_list = []
++            for i in range(2):
++                self.omega_list.append(np.zeros(b))
+ 
++        def rbfs(self, s):
++            # 入力3次元、出力2行動
++            s = s.reshape(3,1) # 2次元配列に整形
++            return np.exp(-np.square(LA.norm((self.mu_list-s)/self.norm_factor, axis=1))/(2*self.var)) 
++    
++        def getQ(self, s, a):
++            return (self.rbfs(s)[a]).dot(self.omega_list[a])
+ 
+-def reward():
+-    t_c = traci.edge.getLastStepHaltingNumber("t_c")
+-    # tt_t = traci.edge.getLastStepHaltingNumber("tt_t")
+-    r_c = traci.edge.getLastStepHaltingNumber("r_c")
+-    # rr_r = traci.edge.getLastStepHaltingNumber("rr_r")
+-    l_c = traci.edge.getLastStepHaltingNumber("l_c")
+-    # ll_l = traci.edge.getLastStepHaltingNumber("ll_l")
+-    b_c = traci.edge.getLastStepHaltingNumber("b_c")
+-    # bb_b = traci.edge.getLastStepHaltingNumber("bb_b")
+-    r =  -(t_c + r_c + l_c + b_c)/300
+-    # r =  -(t_c + tt_t + r_c + rr_r + l_c + ll_l + b_c + bb_b)
+-    return r
++        def select_action(self, s,episode):
++            # e-greedyによる行動選択  
++            epsilon = 0.001 + 0.9 / (1.0+episode)
++            if np.random.rand() < epsilon:
++                action = np.random.randint(self.NUM_ACTION)
++                # print("A")
++                # print(action)
++                return action
++            else:
++                qs = [self.getQ(s,i) for i in range(self.NUM_ACTION)]
++                action = np.argmax(qs)
++                # 最大値をとる行動が複数ある場合はさらにランダムに選択
++                is_greedy_index = np.where(qs == action)[0]
++                if len(is_greedy_index) > 1:
++                    action = np.random.choice(is_greedy_index)
++                # print("B")
++                # print(action)
++                return action
+ 
+-def get_Qvalue(s,a):
+-    return Qtable[s[0]][s[1]][s[2]][a]
++        def train(self,before_s,before_a,r,s,a):
++            phi = self.rbfs(before_s)
++            Qvalue = self.getQ(before_s,before_a)
++            Qvalue_dash = self.getQ(s,a)
++            DELTA = r + self.gamma*Qvalue_dash - Qvalue
++            self.omega_list[before_a] = self.omega_list[before_a] + self.alpha * DELTA * phi[before_a]
+ 
+-if __name__ =="__main__":
+ 
+-    # os.chdir(os.path.dirname(os.path.abspath(__file__)))    
+-    # rewards = []
+-    # travel_time_2 = []
+-    # # traci.start(["sumo-gui", "-c", "rulebase.sumocfg"])
+-    # traci.start(["sumo", "-c", "rulebase.sumocfg"])
+-    # traci.simulationStep(1000)
+-    # cycle = 0
+-    # z = 0
+-    # for iter in range(10):
+-    #     for step in range(95):
+-    #         # r = reward()
+-    #         # rewards.append(r)
+-    #         id = traci.vehicle.getIDList()
+-    #         # check_car()
+-    #         count_traveltime_2(id,cycle)
+-    #         traci.simulationStep()
+-
+-    #     if iter % 10 == 0:
+-    #         if z == 0:
+-    #             z += 1
+-    #         else:
+-    #             a = 0
+-    #             b = 1
+-    #             for i in car_id_2:
+-    #                 if car_id_2[i][1] == cycle:
+-    #                     a += car_id_2[i][0]
+-    #                     b += 1
+-    #             traveltime = a / b
+-    #             # print(traveltime)
+-    #             travel_time_2.append(traveltime)
+-    #             # travel_time_2[0] = None
+-    #             # print(travel_time)
+-    #             cycle += 1
+-    # traci.close()
++    os.chdir(os.path.dirname(os.path.abspath(__file__)))    
++    rewards = []
++    travel_time = []
++    cycle = 0
++    traci.start(["sumo", "-c", "single.sumocfg"]) 
++    # traci.start(["sumo-gui", "-c", "single.sumocfg"]) 
++    # traci.simulationStep(2000)
++    s = get_state()
++    s = np.array(s)
++    a = 0
++    phase_before = 0
++    num = 0
++    agent = LinearFunc()
++    for episode in range(10):
++        for step in range(1000):
++            id = traci.vehicle.getIDList()
++            count_traveltime(id,cycle)
++            phase = traci.trafficlight.getPhase("c")
++            if phase_before == phase:
++                if num == 10:
++                    before_s = s
++                    s = get_state()
++                    s = np.array(s)
++                    before_a = a
++                    a = agent.select_action(s,episode)
++                    r = reward()
++                    agent.train(before_s,before_a,r,s,a)
++                    state_trans(a)
++                    phase_before = traci.trafficlight.getPhase("c")
++                    num = -1
++            else:
++                if num == 13:
++                    before_s = s
++                    s = get_state()
++                    s = np.array(s)
++                    before_a = a
++                    a = agent.select_action(s,episode)
++                    r = reward()
++                    agent.train(before_s,before_a,r,s,a)
++                    state_trans(a)
++                    phase_before = traci.trafficlight.getPhase("c")
++                    num = -1
++            num += 1
++            traci.simulationStep()
++
++        c = 0
++        b = 1
++        for i in car_id:
++            if car_id[i][1] == cycle:
++                c += car_id[i][0]
++                b += 1
++        traveltime = c / b
++        travel_time.append(traveltime)
++        # print(travel_time)
++        cycle += 1
++    traci.close()
++    return travel_time,
++        
++def reinforcement2():
++    Qtable = np.zeros((150,150,2,2))
++    epsilon = 0.1
++    gamma = 0.9
++    alpha = 0.1
++    xmlfl = "reinforcement.net.xml"
++    car_id = {}
++    car_id = defaultdict(list)
++
++
++    def count_traveltime(id,cycle):
++        for i in id:
++            if i not in car_id or car_id[i][1] != cycle:
++                car_id[i] =[0, cycle]
++                # print(car_id[i])
++            else:
++                car_id[i][0] += 1
++                # print(car_id[i])
++
++    def get_state():
++        cars_r_c = traci.edge.getLastStepVehicleNumber("r_c")
++        cars_l_c = traci.edge.getLastStepVehicleNumber("l_c")
++        cars_t_c = traci.edge.getLastStepVehicleNumber("t_c")
++        cars_b_c = traci.edge.getLastStepVehicleNumber("b_c")
++        tate = (cars_t_c + cars_b_c)
++        yoko = (cars_r_c + cars_l_c)
++        phase = traci.trafficlight.getPhase("c")
++        if phase < 4:
++            phase = 0
++        else:
++            phase = 1
++        state = [tate,yoko,phase]
++        return state
++
++    def select_action(s):
++        if epsilon < np.random.uniform(0,1):
++            # print(s[2])
++            q = Qtable[s[0]][s[1]][s[2]]
++            actions = np.where(q == q.max())[0]
++            return np.random.choice(actions)
++        else:
++            return np.random.choice(2)
++
++    def select_action(s):
++        q = Qtable[s[0]][s[1]][s[2]]
++        actions = np.where(q == q.max())[0]
++        return np.random.choice(actions)
++
++    def reward():
++        t_c = traci.edge.getLastStepHaltingNumber("t_c")
++        r_c = traci.edge.getLastStepHaltingNumber("r_c")
++        l_c = traci.edge.getLastStepHaltingNumber("l_c")
++        b_c = traci.edge.getLastStepHaltingNumber("b_c")
++        r =  -(t_c + r_c + l_c + b_c)/300
++        # r =  -(t_c + r_c + l_c + b_c)
++        return r
++
++    def state_trans(a):
++        phase = traci.trafficlight.getPhase("c")
++        # print("action:{0}".format(a))
++        # print("phase:{0}".format(phase))
++        if a == 0:
++            if phase == 0:
++                traci.trafficlight.setPhase("c",0)
++            else:
++                traci.trafficlight.setPhase("c",3)
++        elif a == 1:
++            if phase == 2:
++                traci.trafficlight.setPhase("c",2)
++            else:
++                traci.trafficlight.setPhase("c",1)
++
++    def get_Qvalue(s,a):
++        return Qtable[s[0]][s[1]][s[2]][a]
++
+ 
+     os.chdir(os.path.dirname(os.path.abspath(__file__)))    
+     rewards = []
+     travel_time = []
+     cycle = 0
+-    traci.start(["sumo", "-c", "reinforcement.sumocfg"]) 
+-    # traci.start(["sumo-gui", "-c", "reinforcement.sumocfg"]) 
++    traci.start(["sumo", "-c", "single.sumocfg"]) 
++    # traci.start(["sumo-gui", "-c", "single.sumocfg"]) 
+     # traci.simulationStep(2000)
+     s = get_state()
+     a = 0
+     phase_before = 0
+     num = 0
+-    for iter in range(2000):
++    for iter in range(10):
+         for step in range(1000):
+             id = traci.vehicle.getIDList()
+             count_traveltime(id,cycle)
+             phase = traci.trafficlight.getPhase("c")
+-            # print(num)
+             if phase_before == phase:
+-                if num == 5:
++                if num == 10:
+                     before_s = s
+                     s = get_state()
+                     before_a = a
+@@ -195,9 +362,8 @@ if __name__ =="__main__":
+                     state_trans(a)
+                     phase_before = traci.trafficlight.getPhase("c")
+                     num = -1
+-                    
+             else:
+-                if num == 27:
++                if num == 13:
+                     before_s = s
+                     s = get_state()
+                     before_a = a
+@@ -208,7 +374,6 @@ if __name__ =="__main__":
+                     state_trans(a)
+                     phase_before = traci.trafficlight.getPhase("c")
+                     num = -1
+-                    
+             num += 1
+             traci.simulationStep()
+ 
+@@ -222,21 +387,20 @@ if __name__ =="__main__":
+         travel_time.append(traveltime)
+         # print(travel_time)
+         cycle += 1
++    traci.close()
++    return travel_time
++
++
++
+ 
+-    # print("拡張子を除くフォルダ名")
+-    # folder = input()
+-    # folder = "./qtable/" + folder + ".txt"
+-    # f = open(folder,"wb")
+-    # pickle.dump(Qtable,f)
+-    #plt.rcParams['font.family'] = "IPAexGothic"
+-    # for t in Qtable:
+-    #     print(t)
+-    # print(Qtable)
+-    plt.plot(travel_time)
+-    # p1 = plt.plot(travel_time)
+-    # p2 = plt.plot(travel_time_2)
+-    # plt.legend((p1[0], p2[0]), ("reinforcement", "rulebase"), loc=2)
+-    plt.xlabel("step(×1000)")
+-    plt.ylabel("travel time")
+-    plt.show()
+-    # print(car_id)
++reinforcement = reinforcement()
++rulebase = rulebase()
++reinforcement2 = reinforcement2()
++p1 = plt.plot(rulebase)
++p2 = plt.plot(reinforcement)
++p3 = plt.plot(reinforcement2)
++plt.legend((p1[0],p2[0],p3[0]), ("rulebase","function","reinforcement"), loc=2)
++plt.xlabel("step(×1000)")
++plt.ylabel("travel time")
++plt.show()
++# print(car_id)
+diff --git a/iee/function/single.rou.xml b/iee/function/single.rou.xml
+index 9349eb3..48db142 100644
+--- a/iee/function/single.rou.xml
++++ b/iee/function/single.rou.xml
+@@ -64,10 +64,10 @@
+ <flow id="type11" color="1,1,0" begin="0" end="60000" probability="0.025" type="car" route="l_b"/>
+ <flow id="type12" color="1,1,0" begin="0" end="60000" probability="0.075" type="car" route="l_r"/> -->
+ 
+-<flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.1" type="car" route="b_t"/>
+-<flow id="type2" color="1,1,0" begin="0" end="60000" probability="0.1" type="car" route="t_b"/>
+-<flow id="type3" color="1,1,0" begin="0" end="60000" probability="0.1" type="car" route="l_r"/>
+-<flow id="type4" color="1,1,0" begin="0" end="60000" probability="0.1" type="car" route="r_l"/>
++<flow id="type1" color="1,1,0" begin="0" end="60000" probability="0.3" type="car" route="b_t"/>
++<flow id="type2" color="1,1,0" begin="0" end="60000" probability="0.3" type="car" route="t_b"/>
++<!-- <flow id="type3" color="1,1,0" begin="0" end="60000" probability="0.05" type="car" route="l_r"/>
++<flow id="type4" color="1,1,0" begin="0" end="60000" probability="0.05" type="car" route="r_l"/> -->
+ 
+ 
+ <!-- <personFlow period="10" end="60000" begin="0" id="p1">
+diff --git a/iee/single_transaction/reinforcement.rou.xml b/iee/single_transaction/reinforcement.rou.xml
+deleted file mode 100644
+index 14b80c2..0000000
+--- a/iee/single_transaction/reinforcement.rou.xml
++++ /dev/null
+@@ -1,125 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<routes>
+-<!--
+-  <personFlow id="p" begin="0" end="100" period="10">
+-    <walk edges="l_ll rr_r"/>
+-  </personFlow>
+-  <personFlow id="p2" begin="0" end="100" period="10">
+-    <walk edges="rr_r l_ll"/>
+-  </personFlow>
+-  -->
+-  <vType id="car" type="passenger" accel="3.0" decel="6.0" length="5.0" minGap="2.5" maxSpeed="30.0" sigma="0.5" jmIgnoreKeepClearTime="1" jmIgnoreFoeProb="0" jmCrossingGap="5"/>
+-
+-  <route id="t_b" edges="tt_t t_c c_b b_bb"/>
+-  <route id="t_r" edges="tt_t t_c c_r r_rr"/>
+-  <route id="t_l" edges="tt_t t_c c_l l_ll"/>
+-
+-  <route id="b_t" edges="bb_b b_c c_t t_tt"/>
+-  <route id="b_r" edges="bb_b b_c c_r r_rr"/>
+-  <route id="b_l" edges="bb_b b_c c_l l_ll"/>
+-
+-  <route id="r_t" edges="rr_r r_c c_t t_tt"/>
+-  <route id="r_b" edges="rr_r r_c c_b b_bb"/>
+-  <route id="r_l" edges="rr_r r_c c_l l_ll"/>
+-
+-  <route id="l_t" edges="ll_l l_c c_t t_tt"/>
+-  <route id="l_b" edges="ll_l l_c c_b b_bb"/>
+-  <route id="l_r" edges="ll_l l_c c_r r_rr"/>
+-
+-
+-<!--
+-  <vehicle depart="0" id="veh0" route="route01" type="car" color="1,0,0" /> 
+-  <vehicle depart="0" id="veh1" route="route02" type="car" color="1,0,0" /> 
+-  <vehicle depart="0" id="veh2" route="route03" type="car" color="1,0,0" /> 
+-  <vehicle depart="0" id="veh3" route="route04" type="car" color="1,0,0" /> 
+-
+-<flow id="type1" color="1,1,0" begin="0" end="100" period="10" type="car" route="route01"/>
+-<flow id="type2" color="1,1,0" begin="0" end="100" period="10" type="car" route="route02"/>
+-<flow id="type3" color="1,1,0" begin="0" end="100" period="10" type="car" route="route03"/>
+-<flow id="type4" color="1,1,0" begin="0" end="100" period="10" type="car" route="route04"/>
+-  -->
+-<!-- <flow id="type1" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="t_b"/>
+-<flow id="type2" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="t_r"/>
+-<flow id="type3" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="t_l"/>
+-
+-<flow id="type4" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="b_t"/>
+-<flow id="type5" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="b_r"/>
+-<flow id="type6" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="b_l"/>
+-
+-<flow id="type7" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="r_t"/>
+-<flow id="type8" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="r_b"/>
+-<flow id="type9" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="r_l"/>
+-
+-<flow id="type10" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="l_t"/>
+-<flow id="type11" color="1,1,0" begin="0" end="1000000" vehsPerHour="150" type="car" route="l_b"/>
+-<flow id="type12" color="1,1,0" begin="0" end="1000000" vehsPerHour="300" type="car" route="l_r"/> -->
+-<!-- 比率　1:1 -->
+-<!-- <flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="t_b"/>
+-<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_r"/>
+-<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="t_l"/>
+-<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="b_t"/>
+-<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_r"/>
+-<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="b_l"/>
+-<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_t"/>
+-<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="r_b"/>
+-<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="r_l"/>
+-<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_t"/>
+-<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.04" type="car" route="l_b"/>
+-<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.17" type="car" route="l_r"/> -->
+-
+-<flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="t_b"/>
+-<!-- <flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="t_r"/>
+-<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="t_l"/> -->
+-<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="b_t"/>
+-<!-- <flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="b_r"/>
+-<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="b_l"/>
+-<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="r_t"/>
+-<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="r_b"/> -->
+-<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="r_l"/>
+-<!-- <flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="l_t"/>
+-<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="l_b"/> -->
+-<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="l_r"/>
+-
+-<!-- <flow id="type1" color="1,1,0" begin="0" end="10000000" probability="0.2" type="car" route="t_b"/>
+-<flow id="type2" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="t_r"/>
+-<flow id="type3" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="t_l"/>
+-<flow id="type4" color="1,1,0" begin="0" end="10000000" probability="0.2" type="car" route="b_t"/>
+-<flow id="type5" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="b_r"/>
+-<flow id="type6" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="b_l"/>
+-<flow id="type7" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="r_t"/>
+-<flow id="type8" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="r_b"/>
+-<flow id="type9" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="r_l"/>
+-<flow id="type10" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="l_t"/>
+-<flow id="type11" color="1,1,0" begin="0" end="10000000" probability="0.05" type="car" route="l_b"/>
+-<flow id="type12" color="1,1,0" begin="0" end="10000000" probability="0.1" type="car" route="l_r"/> -->
+-
+-
+-<!-- <personFlow period="10" end="60000" begin="0" id="p1">
+-<walk edges="rr_r l_ll"/>
+-</personFlow>
+-<personFlow period="10" end="60000" begin="0" id="p2">
+-<walk edges="l_ll rr_r "/>
+-</personFlow>
+-
+-<personFlow period="10" end="60000" begin="0" id="p3">
+-<walk edges="ll_l r_rr"/>
+-</personFlow>
+-<personFlow period="10" end="60000" begin="0" id="p4">
+-<walk edges="r_rr ll_l "/>
+-</personFlow>
+-
+-<personFlow period="10" end="60000" begin="0" id="p5">
+-<walk edges="tt_c b_bb"/>
+-</personFlow>
+-<personFlow period="10" end="60000" begin="0" id="p6">
+-<walk edges="b_bb tt_c"/>
+-</personFlow>
+-
+-<personFlow period="10" end="60000" begin="0" id="p7">
+-<walk edges="bb_b t_tt"/>
+-</personFlow>
+-<personFlow period="10" end="60000" begin="0" id="p8">
+-<walk edges="t_tt bb_b"/>
+-</personFlow> -->
+-
+-</routes>
+\ No newline at end of file
+diff --git a/iee/single_transaction/reinforcement_choice.net.xml b/iee/single_transaction/reinforcement_choice.net.xml
+deleted file mode 100644
+index ad8ed12..0000000
+--- a/iee/single_transaction/reinforcement_choice.net.xml
++++ /dev/null
+@@ -1,312 +0,0 @@
+-<net xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.6" junctionCornerDetail="5" limitTurnSpeed="5.50" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+-
+-    <location netOffset="0.00,0.00" convBoundary="-400.00,-400.00,400.00,400.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!" />
+-
+-    <edge id=":b_0" function="internal">
+-        <lane id=":b_0_0" index="0" speed="13.89" length="0.10" shape="-4.80,-200.00 -4.80,-200.00" />
+-        <lane id=":b_0_1" index="1" speed="13.89" length="0.10" shape="-1.60,-200.00 -1.60,-200.00" />
+-    </edge>
+-    <edge id=":b_2" function="internal">
+-        <lane id=":b_2_0" index="0" speed="13.89" length="0.10" shape="8.00,-200.00 8.00,-200.00" />
+-        <lane id=":b_2_1" index="1" speed="13.89" length="0.10" shape="4.80,-200.00 4.80,-200.00" />
+-        <lane id=":b_2_2" index="2" speed="13.89" length="0.10" shape="1.60,-200.00 1.60,-200.00" />
+-    </edge>
+-    <edge id=":c_0" function="internal">
+-        <lane id=":c_0_0" index="0" speed="7.33" length="11.73" shape="-8.00,13.60 -8.35,9.75 -9.40,7.00 -11.15,5.35 -13.60,4.80" />
+-    </edge>
+-    <edge id=":c_1" function="internal">
+-        <lane id=":c_1_0" index="0" speed="13.89" length="27.43" shape="-8.00,13.60 -7.50,4.98 -6.40,-1.39 -5.30,-7.06 -4.80,-13.60" />
+-        <lane id=":c_1_1" index="1" speed="13.89" length="27.43" shape="-4.80,13.60 -4.30,4.98 -3.20,-1.39 -2.10,-7.06 -1.60,-13.60" />
+-    </edge>
+-    <edge id=":c_3" function="internal">
+-        <lane id=":c_3_0" index="0" speed="10.36" length="9.99" shape="-1.60,13.60 -0.65,6.95 1.04,4.14" />
+-    </edge>
+-    <edge id=":c_16" function="internal">
+-        <lane id=":c_16_0" index="0" speed="10.36" length="14.52" shape="1.04,4.14 2.20,2.20 6.95,-0.65 13.60,-1.60" />
+-    </edge>
+-    <edge id=":c_4" function="internal">
+-        <lane id=":c_4_0" index="0" speed="7.33" length="11.73" shape="13.60,8.00 9.75,8.35 7.00,9.40 5.35,11.15 4.80,13.60" />
+-    </edge>
+-    <edge id=":c_5" function="internal">
+-        <lane id=":c_5_0" index="0" speed="13.89" length="27.43" shape="13.60,8.00 4.98,7.50 -1.39,6.40 -7.06,5.30 -13.60,4.80" />
+-        <lane id=":c_5_1" index="1" speed="13.89" length="27.43" shape="13.60,4.80 4.98,4.30 -1.39,3.20 -7.06,2.10 -13.60,1.60" />
+-    </edge>
+-    <edge id=":c_7" function="internal">
+-        <lane id=":c_7_0" index="0" speed="10.36" length="9.99" shape="13.60,1.60 6.95,0.65 4.14,-1.04" />
+-    </edge>
+-    <edge id=":c_17" function="internal">
+-        <lane id=":c_17_0" index="0" speed="10.36" length="14.52" shape="4.14,-1.04 2.20,-2.20 -0.65,-6.95 -1.60,-13.60" />
+-    </edge>
+-    <edge id=":c_8" function="internal">
+-        <lane id=":c_8_0" index="0" speed="7.33" length="11.73" shape="8.00,-13.60 8.35,-9.75 9.40,-7.00 11.15,-5.35 13.60,-4.80" />
+-    </edge>
+-    <edge id=":c_9" function="internal">
+-        <lane id=":c_9_0" index="0" speed="13.89" length="27.43" shape="8.00,-13.60 7.50,-4.98 6.40,1.39 5.30,7.06 4.80,13.60" />
+-        <lane id=":c_9_1" index="1" speed="13.89" length="27.43" shape="4.80,-13.60 4.30,-4.98 3.20,1.39 2.10,7.06 1.60,13.60" />
+-    </edge>
+-    <edge id=":c_11" function="internal">
+-        <lane id=":c_11_0" index="0" speed="10.36" length="9.99" shape="1.60,-13.60 0.65,-6.95 -1.04,-4.14" />
+-    </edge>
+-    <edge id=":c_18" function="internal">
+-        <lane id=":c_18_0" index="0" speed="10.36" length="14.52" shape="-1.04,-4.14 -2.20,-2.20 -6.95,0.65 -13.60,1.60" />
+-    </edge>
+-    <edge id=":c_12" function="internal">
+-        <lane id=":c_12_0" index="0" speed="7.33" length="11.73" shape="-13.60,-8.00 -9.75,-8.35 -7.00,-9.40 -5.35,-11.15 -4.80,-13.60" />
+-    </edge>
+-    <edge id=":c_13" function="internal">
+-        <lane id=":c_13_0" index="0" speed="13.89" length="27.43" shape="-13.60,-8.00 -4.98,-7.50 1.39,-6.40 7.06,-5.30 13.60,-4.80" />
+-        <lane id=":c_13_1" index="1" speed="13.89" length="27.43" shape="-13.60,-4.80 -4.98,-4.30 1.39,-3.20 7.06,-2.10 13.60,-1.60" />
+-    </edge>
+-    <edge id=":c_15" function="internal">
+-        <lane id=":c_15_0" index="0" speed="10.36" length="9.99" shape="-13.60,-1.60 -6.95,-0.65 -4.14,1.04" />
+-    </edge>
+-    <edge id=":c_19" function="internal">
+-        <lane id=":c_19_0" index="0" speed="10.36" length="14.52" shape="-4.14,1.04 -2.20,2.20 0.65,6.95 1.60,13.60" />
+-    </edge>
+-    <edge id=":l_0" function="internal">
+-        <lane id=":l_0_0" index="0" speed="13.89" length="0.10" shape="-200.00,4.80 -200.00,4.80" />
+-        <lane id=":l_0_1" index="1" speed="13.89" length="0.10" shape="-200.00,1.60 -200.00,1.60" />
+-    </edge>
+-    <edge id=":l_2" function="internal">
+-        <lane id=":l_2_0" index="0" speed="13.89" length="0.10" shape="-200.00,-8.00 -200.00,-8.00" />
+-        <lane id=":l_2_1" index="1" speed="13.89" length="0.10" shape="-200.00,-4.80 -200.00,-4.80" />
+-        <lane id=":l_2_2" index="2" speed="13.89" length="0.10" shape="-200.00,-1.60 -200.00,-1.60" />
+-    </edge>
+-    <edge id=":r_0" function="internal">
+-        <lane id=":r_0_0" index="0" speed="13.89" length="0.10" shape="200.00,8.00 200.00,8.00" />
+-        <lane id=":r_0_1" index="1" speed="13.89" length="0.10" shape="200.00,4.80 200.00,4.80" />
+-        <lane id=":r_0_2" index="2" speed="13.89" length="0.10" shape="200.00,1.60 200.00,1.60" />
+-    </edge>
+-    <edge id=":r_3" function="internal">
+-        <lane id=":r_3_0" index="0" speed="13.89" length="0.10" shape="200.00,-4.80 200.00,-4.80" />
+-        <lane id=":r_3_1" index="1" speed="13.89" length="0.10" shape="200.00,-1.60 200.00,-1.60" />
+-    </edge>
+-    <edge id=":t_0" function="internal">
+-        <lane id=":t_0_0" index="0" speed="13.89" length="0.10" shape="-8.00,200.00 -8.00,200.00" />
+-        <lane id=":t_0_1" index="1" speed="13.89" length="0.10" shape="-4.80,200.00 -4.80,200.00" />
+-        <lane id=":t_0_2" index="2" speed="13.89" length="0.10" shape="-1.60,200.00 -1.60,200.00" />
+-    </edge>
+-    <edge id=":t_3" function="internal">
+-        <lane id=":t_3_0" index="0" speed="13.89" length="0.10" shape="4.80,200.00 4.80,200.00" />
+-        <lane id=":t_3_1" index="1" speed="13.89" length="0.10" shape="1.60,200.00 1.60,200.00" />
+-    </edge>
+-
+-    <edge id="b_bb" from="b" to="bb" priority="-1">
+-        <lane id="b_bb_0" index="0" speed="13.89" length="200.00" shape="-4.80,-200.00 -4.80,-400.00" />
+-        <lane id="b_bb_1" index="1" speed="13.89" length="200.00" shape="-1.60,-200.00 -1.60,-400.00" />
+-    </edge>
+-    <edge id="b_c" from="b" to="c" priority="-1">
+-        <lane id="b_c_0" index="0" speed="13.89" length="186.40" shape="8.00,-200.00 8.00,-13.60" />
+-        <lane id="b_c_1" index="1" speed="13.89" length="186.40" shape="4.80,-200.00 4.80,-13.60" />
+-        <lane id="b_c_2" index="2" speed="13.89" length="186.40" shape="1.60,-200.00 1.60,-13.60" />
+-    </edge>
+-    <edge id="bb_b" from="bb" to="b" priority="-1">
+-        <lane id="bb_b_0" index="0" speed="13.89" length="200.00" shape="8.00,-400.00 8.00,-200.00" />
+-        <lane id="bb_b_1" index="1" speed="13.89" length="200.00" shape="4.80,-400.00 4.80,-200.00" />
+-        <lane id="bb_b_2" index="2" speed="13.89" length="200.00" shape="1.60,-400.00 1.60,-200.00" />
+-    </edge>
+-    <edge id="c_b" from="c" to="b" priority="-1">
+-        <lane id="c_b_0" index="0" speed="13.89" length="186.40" shape="-4.80,-13.60 -4.80,-200.00" />
+-        <lane id="c_b_1" index="1" speed="13.89" length="186.40" shape="-1.60,-13.60 -1.60,-200.00" />
+-    </edge>
+-    <edge id="c_l" from="c" to="l" priority="-1">
+-        <lane id="c_l_0" index="0" speed="13.89" length="186.40" shape="-13.60,4.80 -200.00,4.80" />
+-        <lane id="c_l_1" index="1" speed="13.89" length="186.40" shape="-13.60,1.60 -200.00,1.60" />
+-    </edge>
+-    <edge id="c_r" from="c" to="r" priority="-1">
+-        <lane id="c_r_0" index="0" speed="13.89" length="186.40" shape="13.60,-4.80 200.00,-4.80" />
+-        <lane id="c_r_1" index="1" speed="13.89" length="186.40" shape="13.60,-1.60 200.00,-1.60" />
+-    </edge>
+-    <edge id="c_t" from="c" to="t" priority="-1">
+-        <lane id="c_t_0" index="0" speed="13.89" length="186.40" shape="4.80,13.60 4.80,200.00" />
+-        <lane id="c_t_1" index="1" speed="13.89" length="186.40" shape="1.60,13.60 1.60,200.00" />
+-    </edge>
+-    <edge id="l_c" from="l" to="c" priority="-1">
+-        <lane id="l_c_0" index="0" speed="13.89" length="186.40" shape="-200.00,-8.00 -13.60,-8.00" />
+-        <lane id="l_c_1" index="1" speed="13.89" length="186.40" shape="-200.00,-4.80 -13.60,-4.80" />
+-        <lane id="l_c_2" index="2" speed="13.89" length="186.40" shape="-200.00,-1.60 -13.60,-1.60" />
+-    </edge>
+-    <edge id="l_ll" from="l" to="ll" priority="-1">
+-        <lane id="l_ll_0" index="0" speed="13.89" length="200.00" shape="-200.00,4.80 -400.00,4.80" />
+-        <lane id="l_ll_1" index="1" speed="13.89" length="200.00" shape="-200.00,1.60 -400.00,1.60" />
+-    </edge>
+-    <edge id="ll_l" from="ll" to="l" priority="-1">
+-        <lane id="ll_l_0" index="0" speed="13.89" length="200.00" shape="-400.00,-8.00 -200.00,-8.00" />
+-        <lane id="ll_l_1" index="1" speed="13.89" length="200.00" shape="-400.00,-4.80 -200.00,-4.80" />
+-        <lane id="ll_l_2" index="2" speed="13.89" length="200.00" shape="-400.00,-1.60 -200.00,-1.60" />
+-    </edge>
+-    <edge id="r_c" from="r" to="c" priority="-1">
+-        <lane id="r_c_0" index="0" speed="13.89" length="186.40" shape="200.00,8.00 13.60,8.00" />
+-        <lane id="r_c_1" index="1" speed="13.89" length="186.40" shape="200.00,4.80 13.60,4.80" />
+-        <lane id="r_c_2" index="2" speed="13.89" length="186.40" shape="200.00,1.60 13.60,1.60" />
+-    </edge>
+-    <edge id="r_rr" from="r" to="rr" priority="-1">
+-        <lane id="r_rr_0" index="0" speed="13.89" length="200.00" shape="200.00,-4.80 400.00,-4.80" />
+-        <lane id="r_rr_1" index="1" speed="13.89" length="200.00" shape="200.00,-1.60 400.00,-1.60" />
+-    </edge>
+-    <edge id="rr_r" from="rr" to="r" priority="-1">
+-        <lane id="rr_r_0" index="0" speed="13.89" length="200.00" shape="400.00,8.00 200.00,8.00" />
+-        <lane id="rr_r_1" index="1" speed="13.89" length="200.00" shape="400.00,4.80 200.00,4.80" />
+-        <lane id="rr_r_2" index="2" speed="13.89" length="200.00" shape="400.00,1.60 200.00,1.60" />
+-    </edge>
+-    <edge id="t_c" from="t" to="c" priority="-1">
+-        <lane id="t_c_0" index="0" speed="13.89" length="186.40" shape="-8.00,200.00 -8.00,13.60" />
+-        <lane id="t_c_1" index="1" speed="13.89" length="186.40" shape="-4.80,200.00 -4.80,13.60" />
+-        <lane id="t_c_2" index="2" speed="13.89" length="186.40" shape="-1.60,200.00 -1.60,13.60" />
+-    </edge>
+-    <edge id="t_tt" from="t" to="tt" priority="-1">
+-        <lane id="t_tt_0" index="0" speed="13.89" length="200.00" shape="4.80,200.00 4.80,400.00" />
+-        <lane id="t_tt_1" index="1" speed="13.89" length="200.00" shape="1.60,200.00 1.60,400.00" />
+-    </edge>
+-    <edge id="tt_t" from="tt" to="t" priority="-1">
+-        <lane id="tt_t_0" index="0" speed="13.89" length="200.00" shape="-8.00,400.00 -8.00,200.00" />
+-        <lane id="tt_t_1" index="1" speed="13.89" length="200.00" shape="-4.80,400.00 -4.80,200.00" />
+-        <lane id="tt_t_2" index="2" speed="13.89" length="200.00" shape="-1.60,400.00 -1.60,200.00" />
+-    </edge>
+-
+-    <tlLogic id="c" type="static" programID="1" offset="0">
+-        <phase duration="40" state="GGGgrrrrGGGgrrrr" index="0" />
+-        <phase duration="4" state="yyygrrrryyygrrrr" index="1" />
+-        <phase duration="40" state="rrrGrrrrrrrGrrrr" index="2" />
+-        <phase duration="4" state="rrryrrrrrrryrrrr" index="3" />
+-        <phase duration="40" state="rrrrGGGgrrrrGGGg" index="4" />
+-        <phase duration="4" state="rrrryyygrrrryyyg" index="5" />
+-        <phase duration="40" state="rrrrrrrGrrrrrrrG" index="6" />
+-        <phase duration="4" state="rrrrrrryrrrrrrry" index="7" />
+-    </tlLogic>
+-
+-    <junction id="b" type="priority" x="0.00" y="-200.00" incLanes="c_b_0 c_b_1 bb_b_0 bb_b_1 bb_b_2" intLanes=":b_0_0 :b_0_1 :b_2_0 :b_2_1 :b_2_2" shape="-6.40,-200.00 9.60,-200.00 -6.40,-200.00">
+-        <request index="0" response="00000" foes="00000" cont="0" />
+-        <request index="1" response="00000" foes="00000" cont="0" />
+-        <request index="2" response="00000" foes="00000" cont="0" />
+-        <request index="3" response="00000" foes="00000" cont="0" />
+-        <request index="4" response="00000" foes="00000" cont="0" />
+-    </junction>
+-    <junction id="bb" type="dead_end" x="0.00" y="-400.00" incLanes="b_bb_0 b_bb_1" intLanes="" shape="0.00,-400.00 -6.40,-400.00 0.00,-400.00" />
+-    <junction id="c" type="traffic_light" x="0.00" y="0.00" incLanes="t_c_0 t_c_1 t_c_2 r_c_0 r_c_1 r_c_2 b_c_0 b_c_1 b_c_2 l_c_0 l_c_1 l_c_2" intLanes=":c_0_0 :c_1_0 :c_1_1 :c_16_0 :c_4_0 :c_5_0 :c_5_1 :c_17_0 :c_8_0 :c_9_0 :c_9_1 :c_18_0 :c_12_0 :c_13_0 :c_13_1 :c_19_0" shape="-9.60,13.60 6.40,13.60 7.20,11.38 8.20,10.60 9.60,10.04 11.40,9.71 13.60,9.60 13.60,-6.40 11.38,-7.20 10.60,-8.20 10.04,-9.60 9.71,-11.40 9.60,-13.60 -6.40,-13.60 -7.20,-11.38 -8.20,-10.60 -9.60,-10.04 -11.40,-9.71 -13.60,-9.60 -13.60,6.40 -11.38,7.20 -10.60,8.20 -10.04,9.60 -9.71,11.40">
+-        <request index="0" response="0000000000000000" foes="0000000001100000" cont="0" />
+-        <request index="1" response="1000000010000000" foes="1111100011100000" cont="0" />
+-        <request index="2" response="1000000010000000" foes="1111100011100000" cont="0" />
+-        <request index="3" response="1000011010000000" foes="1110011011100000" cont="1" />
+-        <request index="4" response="0000011000000000" foes="0000011000000000" cont="0" />
+-        <request index="5" response="0000111000001111" foes="1000111000001111" cont="0" />
+-        <request index="6" response="0000111000001111" foes="1000111000001111" cont="0" />
+-        <request index="7" response="0110111000001110" foes="0110111000001110" cont="1" />
+-        <request index="8" response="0000000000000000" foes="0110000000000000" cont="0" />
+-        <request index="9" response="1000000010000000" foes="1110000011111000" cont="0" />
+-        <request index="10" response="1000000010000000" foes="1110000011111000" cont="0" />
+-        <request index="11" response="1000000010000110" foes="1110000011100110" cont="1" />
+-        <request index="12" response="0000000000000110" foes="0000000000000110" cont="0" />
+-        <request index="13" response="0000111100001110" foes="0000111110001110" cont="0" />
+-        <request index="14" response="0000111100001110" foes="0000111110001110" cont="0" />
+-        <request index="15" response="0000111001101110" foes="0000111001101110" cont="1" />
+-    </junction>
+-    <junction id="l" type="priority" x="-200.00" y="0.00" incLanes="c_l_0 c_l_1 ll_l_0 ll_l_1 ll_l_2" intLanes=":l_0_0 :l_0_1 :l_2_0 :l_2_1 :l_2_2" shape="-200.00,6.40 -200.00,-9.60 -200.00,6.40">
+-        <request index="0" response="00000" foes="00000" cont="0" />
+-        <request index="1" response="00000" foes="00000" cont="0" />
+-        <request index="2" response="00000" foes="00000" cont="0" />
+-        <request index="3" response="00000" foes="00000" cont="0" />
+-        <request index="4" response="00000" foes="00000" cont="0" />
+-    </junction>
+-    <junction id="ll" type="dead_end" x="-400.00" y="0.00" incLanes="l_ll_0 l_ll_1" intLanes="" shape="-400.00,0.00 -400.00,6.40 -400.00,0.00" />
+-    <junction id="r" type="priority" x="200.00" y="0.00" incLanes="rr_r_0 rr_r_1 rr_r_2 c_r_0 c_r_1" intLanes=":r_0_0 :r_0_1 :r_0_2 :r_3_0 :r_3_1" shape="200.00,9.60 200.00,-6.40 200.00,9.60">
+-        <request index="0" response="00000" foes="00000" cont="0" />
+-        <request index="1" response="00000" foes="00000" cont="0" />
+-        <request index="2" response="00000" foes="00000" cont="0" />
+-        <request index="3" response="00000" foes="00000" cont="0" />
+-        <request index="4" response="00000" foes="00000" cont="0" />
+-    </junction>
+-    <junction id="rr" type="dead_end" x="400.00" y="0.00" incLanes="r_rr_0 r_rr_1" intLanes="" shape="400.00,0.00 400.00,-6.40 400.00,0.00" />
+-    <junction id="t" type="priority" x="0.00" y="200.00" incLanes="tt_t_0 tt_t_1 tt_t_2 c_t_0 c_t_1" intLanes=":t_0_0 :t_0_1 :t_0_2 :t_3_0 :t_3_1" shape="-9.60,200.00 6.40,200.00 -9.60,200.00">
+-        <request index="0" response="00000" foes="00000" cont="0" />
+-        <request index="1" response="00000" foes="00000" cont="0" />
+-        <request index="2" response="00000" foes="00000" cont="0" />
+-        <request index="3" response="00000" foes="00000" cont="0" />
+-        <request index="4" response="00000" foes="00000" cont="0" />
+-    </junction>
+-    <junction id="tt" type="dead_end" x="0.00" y="400.00" incLanes="t_tt_0 t_tt_1" intLanes="" shape="0.00,400.00 6.40,400.00 0.00,400.00" />
+-
+-    <junction id=":c_16_0" type="internal" x="1.04" y="4.14" incLanes=":c_3_0 b_c_0 b_c_1" intLanes=":c_5_0 :c_5_1 :c_7_0 :c_8_0 :c_9_0 :c_9_1 :c_13_0 :c_13_1 :c_15_0" />
+-    <junction id=":c_17_0" type="internal" x="4.14" y="-1.04" incLanes=":c_7_0 l_c_0 l_c_1" intLanes=":c_1_0 :c_1_1 :c_3_0 :c_9_0 :c_9_1 :c_11_0 :c_12_0 :c_13_0 :c_13_1" />
+-    <junction id=":c_18_0" type="internal" x="-1.04" y="-4.14" incLanes=":c_11_0 t_c_0 t_c_1" intLanes=":c_0_0 :c_1_0 :c_1_1 :c_5_0 :c_5_1 :c_7_0 :c_13_0 :c_13_1 :c_15_0" />
+-    <junction id=":c_19_0" type="internal" x="-4.14" y="1.04" incLanes=":c_15_0 r_c_0 r_c_1" intLanes=":c_1_0 :c_1_1 :c_3_0 :c_4_0 :c_5_0 :c_5_1 :c_9_0 :c_9_1 :c_11_0" />
+-
+-    <connection from="b_c" to="c_r" fromLane="0" toLane="0" via=":c_8_0" tl="c" linkIndex="8" dir="r" state="O" />
+-    <connection from="b_c" to="c_t" fromLane="0" toLane="0" via=":c_9_0" tl="c" linkIndex="9" dir="s" state="O" />
+-    <connection from="b_c" to="c_t" fromLane="1" toLane="1" via=":c_9_1" tl="c" linkIndex="10" dir="s" state="O" />
+-    <connection from="b_c" to="c_l" fromLane="2" toLane="1" via=":c_11_0" tl="c" linkIndex="11" dir="l" state="o" />
+-    <connection from="bb_b" to="b_c" fromLane="0" toLane="0" via=":b_2_0" dir="s" state="M" />
+-    <connection from="bb_b" to="b_c" fromLane="1" toLane="1" via=":b_2_1" dir="s" state="M" />
+-    <connection from="bb_b" to="b_c" fromLane="2" toLane="2" via=":b_2_2" dir="s" state="M" />
+-    <connection from="c_b" to="b_bb" fromLane="0" toLane="0" via=":b_0_0" dir="s" state="M" />
+-    <connection from="c_b" to="b_bb" fromLane="1" toLane="1" via=":b_0_1" dir="s" state="M" />
+-    <connection from="c_l" to="l_ll" fromLane="0" toLane="0" via=":l_0_0" dir="s" state="M" />
+-    <connection from="c_l" to="l_ll" fromLane="1" toLane="1" via=":l_0_1" dir="s" state="M" />
+-    <connection from="c_r" to="r_rr" fromLane="0" toLane="0" via=":r_3_0" dir="s" state="M" />
+-    <connection from="c_r" to="r_rr" fromLane="1" toLane="1" via=":r_3_1" dir="s" state="M" />
+-    <connection from="c_t" to="t_tt" fromLane="0" toLane="0" via=":t_3_0" dir="s" state="M" />
+-    <connection from="c_t" to="t_tt" fromLane="1" toLane="1" via=":t_3_1" dir="s" state="M" />
+-    <connection from="l_c" to="c_b" fromLane="0" toLane="0" via=":c_12_0" tl="c" linkIndex="12" dir="r" state="o" />
+-    <connection from="l_c" to="c_r" fromLane="0" toLane="0" via=":c_13_0" tl="c" linkIndex="13" dir="s" state="o" />
+-    <connection from="l_c" to="c_r" fromLane="1" toLane="1" via=":c_13_1" tl="c" linkIndex="14" dir="s" state="o" />
+-    <connection from="l_c" to="c_t" fromLane="2" toLane="1" via=":c_15_0" tl="c" linkIndex="15" dir="l" state="o" />
+-    <connection from="ll_l" to="l_c" fromLane="0" toLane="0" via=":l_2_0" dir="s" state="M" />
+-    <connection from="ll_l" to="l_c" fromLane="1" toLane="1" via=":l_2_1" dir="s" state="M" />
+-    <connection from="ll_l" to="l_c" fromLane="2" toLane="2" via=":l_2_2" dir="s" state="M" />
+-    <connection from="r_c" to="c_t" fromLane="0" toLane="0" via=":c_4_0" tl="c" linkIndex="4" dir="r" state="o" />
+-    <connection from="r_c" to="c_l" fromLane="0" toLane="0" via=":c_5_0" tl="c" linkIndex="5" dir="s" state="o" />
+-    <connection from="r_c" to="c_l" fromLane="1" toLane="1" via=":c_5_1" tl="c" linkIndex="6" dir="s" state="o" />
+-    <connection from="r_c" to="c_b" fromLane="2" toLane="1" via=":c_7_0" tl="c" linkIndex="7" dir="l" state="o" />
+-    <connection from="rr_r" to="r_c" fromLane="0" toLane="0" via=":r_0_0" dir="s" state="M" />
+-    <connection from="rr_r" to="r_c" fromLane="1" toLane="1" via=":r_0_1" dir="s" state="M" />
+-    <connection from="rr_r" to="r_c" fromLane="2" toLane="2" via=":r_0_2" dir="s" state="M" />
+-    <connection from="t_c" to="c_l" fromLane="0" toLane="0" via=":c_0_0" tl="c" linkIndex="0" dir="r" state="O" />
+-    <connection from="t_c" to="c_b" fromLane="0" toLane="0" via=":c_1_0" tl="c" linkIndex="1" dir="s" state="O" />
+-    <connection from="t_c" to="c_b" fromLane="1" toLane="1" via=":c_1_1" tl="c" linkIndex="2" dir="s" state="O" />
+-    <connection from="t_c" to="c_r" fromLane="2" toLane="1" via=":c_3_0" tl="c" linkIndex="3" dir="l" state="o" />
+-    <connection from="tt_t" to="t_c" fromLane="0" toLane="0" via=":t_0_0" dir="s" state="M" />
+-    <connection from="tt_t" to="t_c" fromLane="1" toLane="1" via=":t_0_1" dir="s" state="M" />
+-    <connection from="tt_t" to="t_c" fromLane="2" toLane="2" via=":t_0_2" dir="s" state="M" />
+-
+-    <connection from=":b_0" to="b_bb" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":b_0" to="b_bb" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":b_2" to="b_c" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":b_2" to="b_c" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":b_2" to="b_c" fromLane="2" toLane="2" dir="s" state="M" />
+-    <connection from=":c_0" to="c_l" fromLane="0" toLane="0" dir="r" state="M" />
+-    <connection from=":c_1" to="c_b" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":c_1" to="c_b" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":c_3" to="c_r" fromLane="0" toLane="1" via=":c_16_0" dir="l" state="m" />
+-    <connection from=":c_16" to="c_r" fromLane="0" toLane="1" dir="l" state="M" />
+-    <connection from=":c_4" to="c_t" fromLane="0" toLane="0" dir="r" state="M" />
+-    <connection from=":c_5" to="c_l" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":c_5" to="c_l" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":c_7" to="c_b" fromLane="0" toLane="1" via=":c_17_0" dir="l" state="m" />
+-    <connection from=":c_17" to="c_b" fromLane="0" toLane="1" dir="l" state="M" />
+-    <connection from=":c_8" to="c_r" fromLane="0" toLane="0" dir="r" state="M" />
+-    <connection from=":c_9" to="c_t" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":c_9" to="c_t" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":c_11" to="c_l" fromLane="0" toLane="1" via=":c_18_0" dir="l" state="m" />
+-    <connection from=":c_18" to="c_l" fromLane="0" toLane="1" dir="l" state="M" />
+-    <connection from=":c_12" to="c_b" fromLane="0" toLane="0" dir="r" state="M" />
+-    <connection from=":c_13" to="c_r" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":c_13" to="c_r" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":c_15" to="c_t" fromLane="0" toLane="1" via=":c_19_0" dir="l" state="m" />
+-    <connection from=":c_19" to="c_t" fromLane="0" toLane="1" dir="l" state="M" />
+-    <connection from=":l_0" to="l_ll" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":l_0" to="l_ll" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":l_2" to="l_c" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":l_2" to="l_c" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":l_2" to="l_c" fromLane="2" toLane="2" dir="s" state="M" />
+-    <connection from=":r_0" to="r_c" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":r_0" to="r_c" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":r_0" to="r_c" fromLane="2" toLane="2" dir="s" state="M" />
+-    <connection from=":r_3" to="r_rr" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":r_3" to="r_rr" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":t_0" to="t_c" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":t_0" to="t_c" fromLane="1" toLane="1" dir="s" state="M" />
+-    <connection from=":t_0" to="t_c" fromLane="2" toLane="2" dir="s" state="M" />
+-    <connection from=":t_3" to="t_tt" fromLane="0" toLane="0" dir="s" state="M" />
+-    <connection from=":t_3" to="t_tt" fromLane="1" toLane="1" dir="s" state="M" />
+-
+-</net>
+\ No newline at end of file
+diff --git a/iee/single_transaction/reinforcement_choice.sumocfg b/iee/single_transaction/reinforcement_choice.sumocfg
+deleted file mode 100644
+index dbed691..0000000
+--- a/iee/single_transaction/reinforcement_choice.sumocfg
++++ /dev/null
+@@ -1,6 +0,0 @@
+-<configuration>
+-    <input>
+-       <net-file value="reinforcement_choice.net.xml"/>
+-       <route-files value="reinforcement.rou.xml"/>
+-    </input>
+-</configuration>
+\ No newline at end of file
+diff --git a/jsai/ppo/Vol2/MyEnv/__pycache__/testenv.cpython-38.pyc b/jsai/ppo/Vol2/MyEnv/__pycache__/testenv.cpython-38.pyc
+index dc7075d..9dd4437 100644
+Binary files a/jsai/ppo/Vol2/MyEnv/__pycache__/testenv.cpython-38.pyc and b/jsai/ppo/Vol2/MyEnv/__pycache__/testenv.cpython-38.pyc differ
+diff --git a/jsai/ppo/Vol2/MyEnv/testenv.py b/jsai/ppo/Vol2/MyEnv/testenv.py
+index 250de77..14137cc 100644
+--- a/jsai/ppo/Vol2/MyEnv/testenv.py
++++ b/jsai/ppo/Vol2/MyEnv/testenv.py
+@@ -230,87 +230,200 @@ class SumoEnv2(gym.Env):
+         return next_s, np.array(reward), self.done, {}
+ 
+     def add_car(self,step):
+-        # テスト環境として相応しい交通流を作成する
+         y = int(step)
+         x = str(step)
+-        # if tf[0] == 0:
+-        #     p = 0.125
+-        # elif tf[0] == 1:
+-        #     p = 0.25
+-        # elif tf[0] == 2:
+-        #     p = 0.375
+-        # else:
+-        #     p = 0.5
+ 
+-        # if tf[1] == 0:
+-        #     q = 0.2
+-        # elif tf[1] == 1:
+-        #     q = 0.4
+-        # elif tf[1] == 2:
+-        #     q = 0.6
+-        # else:
+-        #     q = 0.8
+-        if y <= 600:
++        if y <= 400:
+             self.tf[0] = 0
+             # if np.random.uniform(0,1) < 0.125 * 0.2 * 0.5:
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.4:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.4:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+-        elif y <= 1200:
+-            self.tf[0] = 1
++                if np.random.uniform(0,1)  > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
++        elif y <= 800:
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+-        elif y <= 1800:
+-            self.tf[0] = 2
++                if np.random.uniform(0,1)  > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y <= 1200:
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+-        elif y <= 2400:
+-            self.tf[0] = 3
++                if np.random.uniform(0,1)  > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y <= 1600:
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.4:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+-            if np.random.uniform(0,1) < 0.5 * 0.4 :
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')     
+-        elif y <= 3000:
+-            self.tf[0] = 2
+-            if np.random.uniform(0,1) < 0.5 * 0.3 :
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+-            if np.random.uniform(0,1) < 0.5 * 0.3 :
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+-            if np.random.uniform(0,1) < 0.5 * 0.2 :
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+-            if np.random.uniform(0,1) < 0.5 * 0.2 :
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE') 
+-        else:
+-            self.tf[0] = 1
++                if np.random.uniform(0,1)  > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')     
++        elif y <= 2000:
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y >= 2400:
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
++        elif y >= 2800:
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
++        elif y >= 3200:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
++        else:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+                 
+     def get_state(self):
+         r_c = traci.edge.getLastStepVehicleNumber("r_c")
+diff --git a/jsai/ppo/Vol2/MyEnv_feature/__pycache__/testenv.cpython-38.pyc b/jsai/ppo/Vol2/MyEnv_feature/__pycache__/testenv.cpython-38.pyc
+index 916bb38..bb4c0f2 100644
+Binary files a/jsai/ppo/Vol2/MyEnv_feature/__pycache__/testenv.cpython-38.pyc and b/jsai/ppo/Vol2/MyEnv_feature/__pycache__/testenv.cpython-38.pyc differ
+diff --git a/jsai/ppo/Vol2/MyEnv_feature/testenv.py b/jsai/ppo/Vol2/MyEnv_feature/testenv.py
+index 84ed9ad..9584d91 100644
+--- a/jsai/ppo/Vol2/MyEnv_feature/testenv.py
++++ b/jsai/ppo/Vol2/MyEnv_feature/testenv.py
+@@ -230,87 +230,200 @@ class SumoEnv2(gym.Env):
+         return next_s, np.array(reward), self.done, {}
+ 
+     def add_car(self,step):
+-        # テスト環境として相応しい交通流を作成する
+         y = int(step)
+         x = str(step)
+-        # if tf[0] == 0:
+-        #     p = 0.125
+-        # elif tf[0] == 1:
+-        #     p = 0.25
+-        # elif tf[0] == 2:
+-        #     p = 0.375
+-        # else:
+-        #     p = 0.5
+ 
+-        # if tf[1] == 0:
+-        #     q = 0.2
+-        # elif tf[1] == 1:
+-        #     q = 0.4
+-        # elif tf[1] == 2:
+-        #     q = 0.6
+-        # else:
+-        #     q = 0.8
+-        if y <= 600:
++        if y <= 400:
+             self.tf[0] = 0
+             # if np.random.uniform(0,1) < 0.125 * 0.2 * 0.5:
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.4:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.4:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+-        elif y <= 1200:
+-            self.tf[0] = 1
++                if np.random.uniform(0,1)  > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
++        elif y <= 800:
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+-        elif y <= 1800:
+-            self.tf[0] = 2
++                if np.random.uniform(0,1)  > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y <= 1200:
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+-        elif y <= 2400:
+-            self.tf[0] = 3
++                if np.random.uniform(0,1)  > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y <= 1600:
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.4:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+-            if np.random.uniform(0,1) < 0.5 * 0.4 :
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.1:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')     
+-        elif y <= 3000:
+-            self.tf[0] = 2
+-            if np.random.uniform(0,1) < 0.5 * 0.3 :
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+-            if np.random.uniform(0,1) < 0.5 * 0.3 :
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+-            if np.random.uniform(0,1) < 0.5 * 0.2 :
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+-            if np.random.uniform(0,1) < 0.5 * 0.2 :
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE') 
+-        else:
+-            self.tf[0] = 1
++                if np.random.uniform(0,1)  > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')     
++        elif y <= 2000:
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y >= 2400:
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1)  > 0.1:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
++        elif y >= 2800:
+             if np.random.uniform(0,1) < 0.5 * 0.2:
+-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+             if np.random.uniform(0,1) < 0.5 * 0.3:
+-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')    
++                if np.random.uniform(0,1)  > 0.1:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
++        elif y >= 3200:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.1:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
++        else:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.1:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
+ 
+     def get_state(self):
+         r_c = traci.edge.getLastStepVehicleNumber("r_c")
+diff --git a/jsai/ppo/Vol2/add_car.py b/jsai/ppo/Vol2/add_car.py
+index aa5197a..166c650 100644
+--- a/jsai/ppo/Vol2/add_car.py
++++ b/jsai/ppo/Vol2/add_car.py
+@@ -527,4 +527,203 @@
+             if np.random.uniform(0,1)  > 0.1 * int(tf[2]):
+                 traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+             else:
+-                traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+\ No newline at end of file
++                traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        
++
++# JSAI用に適切だと考えられるテスト環境を考える
++
++    def add_car(self,step):
++        y = int(step)
++        x = str(step)
++
++        if y <= 400:
++            self.tf[0] = 0
++            # if np.random.uniform(0,1) < 0.125 * 0.2 * 0.5:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.1:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.1 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
++        elif y <= 800:
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1)  > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y <= 1200:
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.3:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1)  > 0.3 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y <= 1600:
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1)  > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')     
++        elif y <= 2000:
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
++        elif y >= 2400:
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
++        elif y >= 2800:
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.2:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.3:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
++        elif y >= 3200:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
++        else:
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.1:
++                if np.random.uniform(0,1) > 0.2 :
++                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
++                else:
++                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1) > 0.2:
++                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
++                else:
++                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
++            if np.random.uniform(0,1) < 0.5 * 0.4:
++                if np.random.uniform(0,1)  > 0.2:
++                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
++                else:
++                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+\ No newline at end of file

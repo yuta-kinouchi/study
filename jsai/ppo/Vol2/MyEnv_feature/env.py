@@ -169,30 +169,23 @@ class SumoEnv(gym.Env):
             else:
                 self.idlist[i][0] = 1
 
+#訂正済み　ほかにも直していない部分があれば直す
         for i in id_t_r:
-            if i not in self.idlist:
-                self.idlist[i] = [0,0]
+            if self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 t_r += 1
-            else:
-                self.idlist[i][0] = 1
         for i in id_b_r:
-            if i not in self.idlist:
-                self.idlist[i] = [0,0]
+            if self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 b_r += 1
-            else:
-                self.idlist[i][0] = 1
         for i in id_r_r:
-            if i not in self.idlist:
-                self.idlist[i] = [0,0]
+            if self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 r_r += 1
-            else:
-                self.idlist[i][0] = 1
         for i in id_l_r:
-            if i not in self.idlist:
-                self.idlist[i] = [0,0]
+            if self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 l_r += 1
-            else:
-                self.idlist[i][0] = 1
 
 
         self.feature[0].append(t)

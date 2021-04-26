@@ -29,8 +29,6 @@ class SumoEnv2(gym.Env):
         self.reward_range = [-1., 1.]
         self.started = False
         self.reset()
-        self.time = 0
-        self.tf = [0,0,0]
         self.travel_time = []
         self.cycle = 0
         self.episode = 0
@@ -51,37 +49,16 @@ class SumoEnv2(gym.Env):
         self.car_id = defaultdict(list)
         self.idlist = {}
         self.idlist = defaultdict(list)
-        x = 10000
-        s = 0
+        self.time = 0
+        self.tf = [0,0,0]
         for i in range(1000):
             traci.simulationStep()
+            self.add_car(self.tf,self.time)
             if i % 10 == 0:
                 self.get_feature()
-            x = str(x)
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                
-                if np.random.uniform(0,1) > 0.1:
-                    traci.vehicle.addFull(vehID= x + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-                else:
-                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.1:
-                if np.random.uniform(0,1) > 0.1 :
-                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-                else:
-                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                if np.random.uniform(0,1) > 0.1:
-                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-                else:
-                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.4:
-                s += 1
-                if np.random.uniform(0,1)  > 0.1 :
-                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-                else:
-                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
-            x = int(x)
-            x += 1
+            if i % 1000 == 0:
+                self.tf = self.choice_trafficflow()
+            self.time += 1
         return self.get_state()
 
 
@@ -142,15 +119,18 @@ class SumoEnv2(gym.Env):
 
     def choice_trafficflow(self):
         a = random.randint(0,3)
-        b = random.randint(0,3)
+        if a >= 2:
+            b = random.randint(1,2)
+        else:
+            b = random.randint(0,3)
         c = random.randint(1,3)
         tf = [a,b,c]
         return tf
 
     def count_traveltime(self,id,cycle):
         for i in id:
-            if i not in self.car_id :
-                self.car_id[i] =[1]
+            if i not in self.car_id or self.car_id[i][1] != cycle:
+                self.car_id[i] =[0, cycle]
             else:
                 self.car_id[i][0] += 1
 
@@ -198,28 +178,28 @@ class SumoEnv2(gym.Env):
 
         for i in id_t_r:
             if i not in self.idlist:
-                self.idlist[i] = [0,0]
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 t_r += 1
-            else:
-                self.idlist[i][0] = 1
         for i in id_b_r:
             if i not in self.idlist:
-                self.idlist[i] = [0,0]
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 b_r += 1
-            else:
-                self.idlist[i][0] = 1
         for i in id_r_r:
             if i not in self.idlist:
-                self.idlist[i] = [0,0]
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 r_r += 1
-            else:
-                self.idlist[i][0] = 1
         for i in id_l_r:
             if i not in self.idlist:
-                self.idlist[i] = [0,0]
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
+                self.idlist[i][1] = 1
                 l_r += 1
-            else:
-                self.idlist[i][0] = 1
 
         self.feature[0].append(t)
         self.feature[1].append(b)
@@ -231,7 +211,7 @@ class SumoEnv2(gym.Env):
         self.feature[7].append(l_r)
 
     def step(self,action):
-        if self.time % 400 == 0:
+        if self.time % 800 == 0:
             self.tf = self.choice_trafficflow()
         self.state_trans(action)
         for i in range(10):
@@ -276,90 +256,395 @@ class SumoEnv2(gym.Env):
             self.episode += 1
         return next_s, np.array(reward), self.done, {}
 
+# 交差する交通流が変化する環境
     def add_car(self,tf,step):
         # テスト環境として相応しい交通流を作成する
         y = int(step)
         x = str(step)
-        # if tf[0] == 0:
-        #     p = 0.125
-        # elif tf[0] == 1:
-        #     p = 0.25
-        # elif tf[0] == 2:
-        #     p = 0.375
-        # else:
-        #     p = 0.5
-
-        # if tf[1] == 0:
-        #     q = 0.2
-        # elif tf[1] == 1:
-        #     q = 0.4
-        # elif tf[1] == 2:
-        #     q = 0.6
-        # else:
-        #     q = 0.8
-        if y <= 600:
+        if y <= 200:
             self.tf[0] = 0
             # if np.random.uniform(0,1) < 0.125 * 0.2 * 0.5:
             if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.4:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
             if np.random.uniform(0,1) < 0.5 * 0.4:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                if np.random.uniform(0,1)  > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
+        elif y <= 400:
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1)  > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+        elif y <= 600:
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1)  > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+        elif y <= 800:
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1)  > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')     
+        elif y <= 1000:
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.2:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.2 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.2:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1)  > 0.2:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
         elif y <= 1200:
-            self.tf[0] = 1
-            if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-        elif y <= 1800:
-            self.tf[0] = 2
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
             if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
-        elif y <= 2400:
-            self.tf[0] = 3
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 1400:
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 1600:
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.4:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.4 :
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 1800:
             if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.1:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')     
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 2000:
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 2200:
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 2400:
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 2600:
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 2800:
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')
         elif y <= 3000:
-            self.tf[0] = 2
-            if np.random.uniform(0,1) < 0.5 * 0.3 :
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.3 :
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
-            if np.random.uniform(0,1) < 0.5 * 0.2 :
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
-            if np.random.uniform(0,1) < 0.5 * 0.2 :
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE') 
-        else:
-            self.tf[0] = 1
             if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.2:
-                traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
             if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
             if np.random.uniform(0,1) < 0.5 * 0.3:
-                traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')      
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+        elif y <= 3200:
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 3400:
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.1:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.4:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE') 
+        elif y <= 3600:
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x  + "tb",routeID="t_b", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x  + "tl",routeID="t_r", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.2:
+                if np.random.uniform(0,1) > 0.1 :
+                    traci.vehicle.addFull(vehID=x + "bt",routeID="b_t", typeID='DEFAULT_VEHTYPE')
+                else:
+                    traci.vehicle.addFull(vehID=x + "br",routeID="b_l", typeID='DEFAULT_VEHTYPE')
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1) > 0.1:
+                    traci.vehicle.addFull(vehID=x + "rl",routeID="r_l", typeID='DEFAULT_VEHTYPE')  
+                else:
+                    traci.vehicle.addFull(vehID=x + "rt",routeID="r_b", typeID='DEFAULT_VEHTYPE')  
+            if np.random.uniform(0,1) < 0.5 * 0.3:
+                if np.random.uniform(0,1)  > 0.1:
+                    traci.vehicle.addFull(vehID=x + "lr",routeID="l_r", typeID='DEFAULT_VEHTYPE')   
+                else:
+                    traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')  
+  
 
     def get_state(self):
+        num = 20
         r_c = traci.edge.getLastStepVehicleNumber("r_c")
         r_c_l = traci.lane.getLastStepVehicleNumber("r_c_2")
         l_c = traci.edge.getLastStepVehicleNumber("l_c")
@@ -381,7 +666,7 @@ class SumoEnv2(gym.Env):
             phase = [0,0,1,0]
         else:
             phase = [0,0,0,1]
-        if len(self.feature[0]) >= 50:
+        if len(self.feature[0]) >= num:
             f = [[],[],[],[]]
             f__l = [[],[],[],[]]
             f_t = 0
@@ -392,7 +677,7 @@ class SumoEnv2(gym.Env):
             f_b_l = 0
             f_r_l = 0
             f_l_l = 0
-            for i in range(50):
+            for i in range(num):
                 f_t += self.feature[0][-i] 
                 f_b += self.feature[1][-i] 
                 f_r += self.feature[2][-i] 
@@ -412,50 +697,51 @@ class SumoEnv2(gym.Env):
         f__l[1] = f_b_l
         f__l[2] = f_r_l
         f__l[3] = f_l_l
+
         for i in range(4):
-            if f[i] <= 50:
+            if f[i] <= 5:
                 f[i] = 0
-            elif f[i] <= 100:
+            elif f[i] <= 10:
                 f[i] = 1
-            elif f[i] <= 150:
+            elif f[i] <= 15:
                 f[i] = 2
-            elif f[i] <= 200:
+            elif f[i] <= 20:
                 f[i] = 3
-            elif f[i] <= 250:
+            elif f[i] <= 25:
                 f[i] = 4
-            elif f[i] <= 300:
+            elif f[i] <= 30:
                 f[i] = 5
-            elif f[i] <= 350:
+            elif f[i] <= 35:
                 f[i] = 6
-            elif f[i] <= 400:
+            elif f[i] <= 40:
                 f[i] = 7
-            elif f[i] <= 450:
+            elif f[i] <= 45:
                 f[i] = 8
-            elif f[i] <= 500:
+            elif f[i] <= 50:
                 f[i] = 9
             else:
                 f[i] = 10
 
         for i in range(4):
-            if f__l[i] <= 15:
+            if f__l[i] <= 1:
                 f__l[i] = 0
-            elif f__l[i] <= 30:
+            elif f__l[i] <= 2:
                 f__l[i] = 1
-            elif f__l[i] <= 45:
+            elif f__l[i] <= 3:
                 f__l[i] = 2
-            elif f__l[i] <= 60:
+            elif f__l[i] <= 4:
                 f__l[i] = 3
-            elif f__l[i] <= 75:
+            elif f__l[i] <= 5:
                 f__l[i] = 4
-            elif f__l[i]<= 90:
+            elif f__l[i]<= 6:
                 f__l[i] = 5
-            elif f__l[i] <= 105:
+            elif f__l[i] <= 7:
                 f__l[i] = 6
-            elif f__l[i] <= 120:
+            elif f__l[i] <= 8:
                 f__l[i] = 7
-            elif f__l[i] <= 135:
+            elif f__l[i] <= 9:
                 f__l[i] = 8
-            elif f__l[i] <= 150:
+            elif f__l[i] <= 10:
                 f__l[i] = 9
             else:
                 f__l[i] = 10

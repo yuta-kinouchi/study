@@ -28,28 +28,36 @@ class SumoEnv(gym.Env):
         self.reward_range = [-1., 1.]
         self.started = False
         self.reset()
-        self.time = 0
-        self.tf = [0,0,0]
-        self.idlist = {}
-        self.idlist = defaultdict(list)
         self.travel_time = []
         self.cycle = 0
-        self.car_id = {}
-        self.car_id = defaultdict(list)
         self.episode = 0
        #self.lane_dict = {"gneE1_0": [0, 0, 0, 0, 1], "gne"}
 
     def reset(self):
         if self.started:
             traci.close()
-        # traci.start(["sumo-gui", "-c", os.path.expanduser("../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
-        traci.start(["sumo", "-c", os.path.expanduser("../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
+        # traci.start(["sumo-gui", "-c", os.path.expanduser("../../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
+        traci.start(["sumo", "-c", os.path.expanduser("../../cfg/single/single.sumocfg"), "--step-length", "1", "--lanechange.duration","1.0"])
         # while "0" not in traci.vehicle.getIDList():
         #     traci.simulationStep()
         self.started = True
         self.s = 0
         self.done = False
+        self.car_id = {}
+        self.car_id = defaultdict(list)
+        self.idlist = {}
+        self.idlist = defaultdict(list)
+        self.time = 0
+        self.tf = [0,0,0]
         self.feature = [[],[],[],[],[],[],[],[]]
+        for i in range(1000):
+            traci.simulationStep()
+            self.add_car(self.tf,self.time)
+            if i % 10 == 0:
+                self.get_feature()
+            if i % 1000 == 0:
+                self.tf = self.choice_trafficflow()
+            self.time += 1
         return self.get_state()
 
 
@@ -97,9 +105,13 @@ class SumoEnv(gym.Env):
                     traci.simulationStep()
                 traci.trafficlight.setPhase("c",6)
 
+
     def choice_trafficflow(self):
         a = random.randint(0,3)
-        b = random.randint(0,3)
+        if a >= 2:
+            b = random.randint(1,2)
+        else:
+            b = random.randint(0,3)
         c = random.randint(1,3)
         tf = [a,b,c]
         return tf
@@ -128,6 +140,7 @@ class SumoEnv(gym.Env):
         b_r = 0
         r_r = 0
         l_r = 0
+        # print(self.idlist)
         for i in id_t:
             if i not in self.idlist:
                 self.idlist[i] = [0,0]
@@ -154,19 +167,27 @@ class SumoEnv(gym.Env):
                 self.idlist[i][0] = 1
 
         for i in id_t_r:
-            if self.idlist[i][1] == 0:
+            if i not in self.idlist:
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
                 self.idlist[i][1] = 1
                 t_r += 1
         for i in id_b_r:
-            if self.idlist[i][1] == 0:
+            if i not in self.idlist:
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
                 self.idlist[i][1] = 1
                 b_r += 1
         for i in id_r_r:
-            if self.idlist[i][1] == 0:
+            if i not in self.idlist:
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
                 self.idlist[i][1] = 1
                 r_r += 1
         for i in id_l_r:
-            if self.idlist[i][1] == 0:
+            if i not in self.idlist:
+                self.idlist[i] = [0,1]
+            elif self.idlist[i][1] == 0:
                 self.idlist[i][1] = 1
                 l_r += 1
 
@@ -180,7 +201,8 @@ class SumoEnv(gym.Env):
         self.feature[7].append(l_r)
 
     def step(self,action):
-        if self.time % 300 == 0:
+       
+        if self.time % 1000 == 0:
             self.tf = self.choice_trafficflow()
         self.state_trans(action)
         for i in range(10):
@@ -193,7 +215,7 @@ class SumoEnv(gym.Env):
         self.get_feature()
         reward = self._get_reward(next_s, action)
         t = traci.simulation.getTime()
-        if t >= 3600:
+        if t >= 4600:
             a = 0
             b = 1
             for i in self.car_id:
@@ -205,14 +227,14 @@ class SumoEnv(gym.Env):
             self.cycle += 1
             self.done = True
             self.episode += 1
-            if self.episode == 100:
-                fig = plt.figure()
-                ax = fig.add_subplot(111)
-                ax.set_xlabel("episode", size = 14, weight = "light")
-                ax.set_xlabel("travel time", size = 14, weight = "light")
-                ax = fig.add_subplot(1, 1, 1)
-                ax.plot(self.travel_time)
-                plt.show()
+            # if self.episode == 100:
+            #     fig = plt.figure()
+            #     ax = fig.add_subplot(111)
+            #     ax.set_xlabel("episode", size = 14, weight = "light")
+            #     ax.set_xlabel("travel time", size = 14, weight = "light")
+            #     ax = fig.add_subplot(1, 1, 1)
+            #     ax.plot(self.travel_time)
+            #     plt.show()
         return next_s, np.array(reward), self.done, {}
 
     def add_car(self,tf,step):
@@ -257,6 +279,7 @@ class SumoEnv(gym.Env):
                 traci.vehicle.addFull(vehID=x + "lb",routeID="l_t", typeID='DEFAULT_VEHTYPE')   
 
     def get_state(self):
+        num = 80
         r_c = traci.edge.getLastStepVehicleNumber("r_c")
         r_c_l = traci.lane.getLastStepVehicleNumber("r_c_2")
         l_c = traci.edge.getLastStepVehicleNumber("l_c")
@@ -278,7 +301,7 @@ class SumoEnv(gym.Env):
             phase = [0,0,1,0]
         else:
             phase = [0,0,0,1]
-        if len(self.feature[0]) >= 50:
+        if len(self.feature[0]) >= num:
             f = [[],[],[],[]]
             f__l = [[],[],[],[]]
             f_t = 0
@@ -289,7 +312,7 @@ class SumoEnv(gym.Env):
             f_b_l = 0
             f_r_l = 0
             f_l_l = 0
-            for i in range(50):
+            for i in range(num):
                 f_t += self.feature[0][-i] 
                 f_b += self.feature[1][-i] 
                 f_r += self.feature[2][-i] 
@@ -309,54 +332,56 @@ class SumoEnv(gym.Env):
         f__l[1] = f_b_l
         f__l[2] = f_r_l
         f__l[3] = f_l_l
+# 800stepを参照する際
         for i in range(4):
-            if f[i] <= 10:
+            if f[i] <= 20:
                 f[i] = 0
-            elif f[i] <= 20:
-                f[i] = 1
-            elif f[i] <= 30:
-                f[i] = 2
             elif f[i] <= 40:
-                f[i] = 3
-            elif f[i] <= 50:
-                f[i] = 4
+                f[i] = 1
             elif f[i] <= 60:
-                f[i] = 5
-            elif f[i] <= 70:
-                f[i] = 6
+                f[i] = 2
             elif f[i] <= 80:
-                f[i] = 7
-            elif f[i] <= 90:
-                f[i] = 8
+                f[i] = 3
             elif f[i] <= 100:
+                f[i] = 4
+            elif f[i] <= 120:
+                f[i] = 5
+            elif f[i] <= 140:
+                f[i] = 6
+            elif f[i] <= 160:
+                f[i] = 7
+            elif f[i] <= 180:
+                f[i] = 8
+            elif f[i] <= 200:
                 f[i] = 9
             else:
                 f[i] = 10
 
         for i in range(4):
-            if f__l[i] <= 3:
+            if f__l[i] <= 6:
                 f__l[i] = 0
-            elif f__l[i] <= 6:
-                f__l[i] = 1
-            elif f__l[i] <= 9:
-                f__l[i] = 2
             elif f__l[i] <= 12:
-                f__l[i] = 3
-            elif f__l[i] <= 15:
-                f__l[i] = 4
-            elif f__l[i]<= 18:
-                f__l[i] = 5
-            elif f__l[i] <= 21:
-                f__l[i] = 6
+                f__l[i] = 1
+            elif f__l[i] <= 18:
+                f__l[i] = 2
             elif f__l[i] <= 24:
-                f__l[i] = 7
-            elif f__l[i] <= 27:
-                f__l[i] = 8
+                f__l[i] = 3
             elif f__l[i] <= 30:
+                f__l[i] = 4
+            elif f__l[i]<= 36:
+                f__l[i] = 5
+            elif f__l[i] <= 42:
+                f__l[i] = 6
+            elif f__l[i] <= 48:
+                f__l[i] = 7
+            elif f__l[i] <= 54:
+                f__l[i] = 8
+            elif f__l[i] <= 60:
                 f__l[i] = 9
             else:
                 f__l[i] = 10
         state = [r_c,l_c,t_c,b_c,r_c_l,l_c_l,t_c_l,b_c_l,phase[0],phase[1],phase[2],phase[3],f[0],f[1],f[2],f[3],f__l[0],f__l[1],f__l[2],f__l[3]]
+        # print(state)
         return np.array(state, dtype="float32")
 
     def _get_reward(self,next_s, action):
@@ -395,3 +420,446 @@ if __name__ == "__main__":
         num = random.randint(0,3)
         s, r, done, i = Env.step(0)
     traci.close
+# 100stepを参照する際
+
+        # for i in range(4):
+        #     if f[i] <= 3:
+        #         f[i] = 0
+        #     elif f[i] <= 6:
+        #         f[i] = 1
+        #     elif f[i] <= 9:
+        #         f[i] = 2
+        #     elif f[i] <= 12:
+        #         f[i] = 3
+        #     elif f[i] <= 15:
+        #         f[i] = 4
+        #     elif f[i] <= 18:
+        #         f[i] = 5
+        #     elif f[i] <= 21:
+        #         f[i] = 6
+        #     elif f[i] <= 24:
+        #         f[i] = 7
+        #     elif f[i] <= 27:
+        #         f[i] = 8
+        #     elif f[i] <= 30:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 1:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 2:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 3:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 4:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 5:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 6:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 7:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 8:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 9:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 10:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+# 200stepを参照する際
+        # for i in range(4):
+        #     if f[i] <= 5:
+        #         f[i] = 0
+        #     elif f[i] <= 10:
+        #         f[i] = 1
+        #     elif f[i] <= 15:
+        #         f[i] = 2
+        #     elif f[i] <= 20:
+        #         f[i] = 3
+        #     elif f[i] <= 25:
+        #         f[i] = 4
+        #     elif f[i] <= 30:
+        #         f[i] = 5
+        #     elif f[i] <= 35:
+        #         f[i] = 6
+        #     elif f[i] <= 40:
+        #         f[i] = 7
+        #     elif f[i] <= 45:
+        #         f[i] = 8
+        #     elif f[i] <= 50:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 1:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 2:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 3:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 4:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 5:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 6:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 7:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 8:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 9:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 10:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+# 300stepを参照する際
+        # for i in range(4):
+        #     if f[i] <= 5 * 3 / 2:
+        #         f[i] = 0
+        #     elif f[i] <= 10* 3 / 2:
+        #         f[i] = 1
+        #     elif f[i] <= 15* 3 / 2:
+        #         f[i] = 2
+        #     elif f[i] <= 20* 3 / 2:
+        #         f[i] = 3
+        #     elif f[i] <= 25* 3 / 2:
+        #         f[i] = 4
+        #     elif f[i] <= 30* 3 / 2:
+        #         f[i] = 5
+        #     elif f[i] <= 35* 3 / 2:
+        #         f[i] = 6
+        #     elif f[i] <= 40* 3 / 2:
+        #         f[i] = 7
+        #     elif f[i] <= 45* 3 / 2:
+        #         f[i] = 8
+        #     elif f[i] <= 50* 3 / 2:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 2:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 4:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 6:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 8:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 10:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 12:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 14:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 16:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 18:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 20:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+# 400stepを参照する際
+        # for i in range(4):
+        #     if f[i] <= 10:
+        #         f[i] = 0
+        #     elif f[i] <= 20:
+        #         f[i] = 1
+        #     elif f[i] <= 30:
+        #         f[i] = 2
+        #     elif f[i] <= 40:
+        #         f[i] = 3
+        #     elif f[i] <= 50:
+        #         f[i] = 4
+        #     elif f[i] <= 60:
+        #         f[i] = 5
+        #     elif f[i] <= 70:
+        #         f[i] = 6
+        #     elif f[i] <= 80:
+        #         f[i] = 7
+        #     elif f[i] <= 90:
+        #         f[i] = 8
+        #     elif f[i] <= 100:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 3:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 6:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 9:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 12:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 15:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 18:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 21:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 24:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 27:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 30:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+# 500step 
+        # for i in range(4):
+        #     if f[i] <= 5 *2.5:
+        #         f[i] = 0
+        #     elif f[i] <= 10*2.5:
+        #         f[i] = 1
+        #     elif f[i] <= 15*2.5:
+        #         f[i] = 2
+        #     elif f[i] <= 20*2.5:
+        #         f[i] = 3
+        #     elif f[i] <= 25*2.5:
+        #         f[i] = 4
+        #     elif f[i] <= 30*2.5:
+        #         f[i] = 5
+        #     elif f[i] <= 35*2.5:
+        #         f[i] = 6
+        #     elif f[i] <= 40*2.5:
+        #         f[i] = 7
+        #     elif f[i] <= 45*2.5:
+        #         f[i] = 8
+        #     elif f[i] <= 50*2.5:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+
+        # for i in range(4):
+        #     if f__l[i] <= 3:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 6:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 9:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 12:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 15:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 18:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 21:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 24:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 27:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 30:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+# 600step
+        # for i in range(4):
+        #     if f[i] <= 15:
+        #         f[i] = 0
+        #     elif f[i] <= 30:
+        #         f[i] = 1
+        #     elif f[i] <= 45:
+        #         f[i] = 2
+        #     elif f[i] <= 60:
+        #         f[i] = 3
+        #     elif f[i] <= 75:
+        #         f[i] = 4
+        #     elif f[i] <= 90:
+        #         f[i] = 5
+        #     elif f[i] <= 105:
+        #         f[i] = 6
+        #     elif f[i] <= 120:
+        #         f[i] = 7
+        #     elif f[i] <= 135:
+        #         f[i] = 8
+        #     elif f[i] <= 150:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 3:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 6:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 9:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 12:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 15:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 18:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 21:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 24:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 27:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 30:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+# 800stepを参照する際
+        # for i in range(4):
+        #     if f[i] <= 20:
+        #         f[i] = 0
+        #     elif f[i] <= 40:
+        #         f[i] = 1
+        #     elif f[i] <= 60:
+        #         f[i] = 2
+        #     elif f[i] <= 80:
+        #         f[i] = 3
+        #     elif f[i] <= 100:
+        #         f[i] = 4
+        #     elif f[i] <= 120:
+        #         f[i] = 5
+        #     elif f[i] <= 140:
+        #         f[i] = 6
+        #     elif f[i] <= 160:
+        #         f[i] = 7
+        #     elif f[i] <= 180:
+        #         f[i] = 8
+        #     elif f[i] <= 200:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 6:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 12:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 18:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 24:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 30:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 36:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 42:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 48:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 54:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 60:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+#1000エピソードを参照する
+        # for i in range(4):
+        #     if f[i] <= 25:
+        #         f[i] = 0
+        #     elif f[i] <= 50:
+        #         f[i] = 1
+        #     elif f[i] <= 75:
+        #         f[i] = 2
+        #     elif f[i] <= 100:
+        #         f[i] = 3
+        #     elif f[i] <= 125:
+        #         f[i] = 4
+        #     elif f[i] <= 150:
+        #         f[i] = 5
+        #     elif f[i] <= 175:
+        #         f[i] = 6
+        #     elif f[i] <= 200:
+        #         f[i] = 7
+        #     elif f[i] <= 225:
+        #         f[i] = 8
+        #     elif f[i] <= 250:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 5:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 10:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 15:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 20:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 25:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 30:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 35:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 40:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 45:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 50:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
+
+        
+#1200エピソードを参照する
+        # for i in range(4):
+        #     if f[i] <= 30:
+        #         f[i] = 0
+        #     elif f[i] <= 60:
+        #         f[i] = 1
+        #     elif f[i] <= 90:
+        #         f[i] = 2
+        #     elif f[i] <= 120:
+        #         f[i] = 3
+        #     elif f[i] <= 150:
+        #         f[i] = 4
+        #     elif f[i] <= 180:
+        #         f[i] = 5
+        #     elif f[i] <= 210:
+        #         f[i] = 6
+        #     elif f[i] <= 240:
+        #         f[i] = 7
+        #     elif f[i] <= 270:
+        #         f[i] = 8
+        #     elif f[i] <= 300:
+        #         f[i] = 9
+        #     else:
+        #         f[i] = 10
+
+        # for i in range(4):
+        #     if f__l[i] <= 6:
+        #         f__l[i] = 0
+        #     elif f__l[i] <= 12:
+        #         f__l[i] = 1
+        #     elif f__l[i] <= 18:
+        #         f__l[i] = 2
+        #     elif f__l[i] <= 24:
+        #         f__l[i] = 3
+        #     elif f__l[i] <= 30:
+        #         f__l[i] = 4
+        #     elif f__l[i]<= 36:
+        #         f__l[i] = 5
+        #     elif f__l[i] <= 42:
+        #         f__l[i] = 6
+        #     elif f__l[i] <= 48:
+        #         f__l[i] = 7
+        #     elif f__l[i] <= 54:
+        #         f__l[i] = 8
+        #     elif f__l[i] <= 60:
+        #         f__l[i] = 9
+        #     else:
+        #         f__l[i] = 10
